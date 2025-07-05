@@ -12,11 +12,11 @@ import org.springframework.stereotype.Component;
 public class CreateUserService implements Handler<CreateUserRequest, String> {
   private final UserRepository userRepository;
 
-  public String execute(final CreateUserRequest request) {
-    if (userRepository.existsByEmail(request.getEmail())) {
+  public String handle(final CreateUserRequest request) {
+    if (userRepository.existsByEmail(request.email())) {
       throw new IllegalStateException("The user has already been registered.");
     }
-    final User user = new User(request.getEmail(), request.getPassword());
+    final User user = new User(request.email(), request.password());
     userRepository.save(user);
     return user.getEmail();
   }
