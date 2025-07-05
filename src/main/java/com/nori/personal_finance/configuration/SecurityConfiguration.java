@@ -29,35 +29,35 @@ public class SecurityConfiguration {
   public SecurityFilterChain userSecurityFilterChain(
       final HttpSecurity http, final UserDetailsService userDetailsService) throws Exception {
     return http.csrf(AbstractHttpConfigurer::disable)
-               .authorizeHttpRequests(
-                   auth ->
-                       auth.requestMatchers(
-                               "/",
-                               "/css/**",
-                               "/js/**",
-                               "/register/**",
-                               LOGIN_URL, // Check this line
-                               LOGIN_URL + "?error=true",
-                               LOGIN_URL + "?logout=true",
-                               "/registration-success")
-                           .permitAll()
-                           .anyRequest()
-                           .authenticated())
-               .userDetailsService(userDetailsService)
-               .formLogin(
-                   form ->
-                       form.loginPage(LOGIN_URL) // Check this line
-                           .loginProcessingUrl(LOGIN_URL) // Check this line
-                           .successHandler(
-                               (request, response, authentication) -> response.sendRedirect("/dashboard"))
-                           .failureUrl(LOGIN_URL + "?error=true"))
-               .logout(
-                   logout ->
-                       logout
-                           .logoutUrl("/logout")
-                           .logoutSuccessUrl(LOGIN_URL + "?logout=true")
-                           .invalidateHttpSession(true)
-                           .deleteCookies("JSESSIONID"))
-               .build();
+        .authorizeHttpRequests(
+            auth ->
+                auth.requestMatchers(
+                        "/",
+                        "/css/**",
+                        "/js/**",
+                        "/register/**",
+                        LOGIN_URL,
+                        LOGIN_URL + "?error=true",
+                        LOGIN_URL + "?logout=true",
+                        "/registration-success")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated())
+        .userDetailsService(userDetailsService)
+        .formLogin(
+            form ->
+                form.loginPage(LOGIN_URL)
+                    .loginProcessingUrl(LOGIN_URL)
+                    .successHandler(
+                        (request, response, authentication) -> response.sendRedirect("/dashboard"))
+                    .failureUrl(LOGIN_URL + "?error=true"))
+        .logout(
+            logout ->
+                logout
+                    .logoutUrl("/logout")
+                    .logoutSuccessUrl(LOGIN_URL + "?logout=true")
+                    .invalidateHttpSession(true)
+                    .deleteCookies("JSESSIONID"))
+        .build();
   }
 }

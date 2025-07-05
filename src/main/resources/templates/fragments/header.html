@@ -4,12 +4,24 @@
 <header th:fragment="header" class="container">
     <nav>
         <ul>
-            <li><strong>Finanças Pessoais</strong></li>
+            <li>
+                <a th:href="@{/dashboard}" class="brand">
+                    <strong><i class="fa-solid fa-wallet" aria-hidden="true"></i> Finanças Pessoais</strong>
+                </a>
+            </li>
+            <li>
+                <a th:href="@{/dashboard}">Visão Geral</a>
+            </li>
+            <li>
+                <a th:href="@{/transactions}">Lançamentos</a>
+            </li>
         </ul>
         <ul>
             <li>
-                <form th:action="@{/logout}" method="post">
-                    <button type.submit" class="secondary">Sair</button>
+                <form th:action="@{/logout}" method="post" style="margin: 0;">
+                    <button type="submit" class="secondary outline">
+                        <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i> Sair
+                    </button>
                 </form>
             </li>
         </ul>

@@ -1,11 +1,8 @@
 package com.nori.personal_finance.controller;
 
 import com.nori.personal_finance.dto.CreateUserRequest;
-// You can use either AuthenticationService or Mediator, depending on your final design.
-// This example assumes you are using the AuthenticationService you provided.
 import com.nori.personal_finance.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,23 +14,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 @RequiredArgsConstructor
 public class AuthenticationController {
+
   private final AuthenticationService authenticationService;
 
-  @GetMapping("/")
-  public String rootRedirect(final Authentication authentication) {
-    if (authentication != null && authentication.isAuthenticated()) {
-      return "redirect:/dashboard";
-    }
-    return "redirect:/login";
-  }
-
   @GetMapping("/login")
-  public String userLoginPage(final Authentication authentication, final Model model) {
-    if (authentication != null && authentication.isAuthenticated()) {
-      return "redirect:/dashboard";
-    }
-    model.addAttribute("contentFragment", "authentication/login");
-    return "layout";
+  public String userLoginPage(final Model model) {
+    return "authentication/login";
   }
 
   @GetMapping("/register")
@@ -42,7 +28,7 @@ public class AuthenticationController {
       model.addAttribute("userRequest", new CreateUserRequest("", ""));
     }
     model.addAttribute("contentFragment", "authentication/register");
-    return "layout";
+    return "authentication/register";
   }
 
   @PostMapping("/register")
@@ -61,7 +47,7 @@ public class AuthenticationController {
     try {
       authenticationService.createUser(formSubmission);
       redirectAttributes.addFlashAttribute("successMessage", "Cadastro realizado com sucesso!");
-      return "redirect:/";
+      return "redirect:/login";
 
     } catch (final IllegalStateException e) {
       redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
