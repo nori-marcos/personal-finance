@@ -1,8 +1,7 @@
 package com.nori.personal_finance.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -10,7 +9,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,31 +17,25 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "transactions")
-public class Transaction {
+@Table(name = "credit_cards")
+public class CreditCard {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private String description;
+  @Column(nullable = false)
+  private String name;
 
-  private BigDecimal amount;
+  @Column(nullable = false)
+  private BigDecimal limitAmount;
 
-  private LocalDate transactionDate;
+  @Column(nullable = false)
+  private int closingDay;
 
-  private LocalDate paymentDate;
-
-  @Enumerated(EnumType.STRING)
-  private TransactionType type;
-
-  @Enumerated(EnumType.STRING)
-  private PaymentType paymentType;
+  @Column(nullable = false)
+  private int dueDay;
 
   @ManyToOne private Account account;
-
-  @ManyToOne private CreditCard creditCard;
-
-  @ManyToOne private Category category;
 
   @JoinColumn(name = "user_email", referencedColumnName = "email")
   @ManyToOne
