@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<body>
+<div th:fragment="content">
+
+    <div class="level">
+        <div class="level-left">
+            <h1 class="title">Lançamentos</h1>
+        </div>
+        <div class="level-right">
+            <button class="button is-primary is-hidden-touch" id="add-transaction-button">
+                <span class="icon"><i class="fa-solid fa-plus"></i></span>
+                <span>Novo Lançamento</span>
+            </button>
+        </div>
+    </div>
+
+    <nav class="level box is-mobile">
+        <div class="level-item">
+            <a th:href="@{/transactions(year=${previousDate.year}, month=${previousDate.monthValue})}" class="button">
+                <span class="icon"><i class="fa-solid fa-chevron-left"></i></span>
+            </a>
+        </div>
+        <div class="level-item">
+            <h2 class="subtitle has-text-centered"
+                th:text="${#temporals.format(currentDate, 'MMMM yyyy', new java.util.Locale('pt', 'BR'))}"></h2>
+        </div>
+        <div class="level-item">
+            <a th:href="@{/transactions(year=${nextDate.year}, month=${nextDate.monthValue})}" class="button">
+                <span class="icon"><i class="fa-solid fa-chevron-right"></i></span>
+            </a>
+        </div>
+    </nav>
+
+
+    <div th:if="${#lists.isEmpty(transactions)}" class="box">
+        <p>Nenhum lançamento encontrado para este mês.</p>
+    </div>
+
+    <div class="box" th:each="transaction : ${transactions}">
+        <article class="media">
+            <div class="media-content">
+                <div class="content">
+                    <p>
+                        <strong th:text="${transaction.description}">Descrição da Transação</strong>
+                        <br>
+                        <small th:text="${#temporals.format(transaction.transactionDate, 'dd/MM/yyyy')}"></small>
+                    </p>
+                </div>
+            </div>
+            <div class="media-right">
+                <span th:if="${transaction.type.name() == 'INCOME'}" class="has-text-success"
+                      th:text="'+ R$ ' + ${#numbers.formatDecimal(transaction.amount, 1, 'POINT', 2, 'COMMA')}"></span>
+                <span th:if="${transaction.type.name() == 'EXPENSE'}" class="has-text-danger"
+                      th:text="'- R$ ' + ${#numbers.formatDecimal(transaction.amount, 1, 'POINT', 2, 'COMMA')}"></span>
+            </div>
+        </article>
+    </div>
+
+    <div th:replace="~{fragments/add-transaction-modal :: modal}"></div>
+</div>
+</body>
+</html>

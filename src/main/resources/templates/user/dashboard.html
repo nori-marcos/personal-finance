@@ -2,73 +2,61 @@
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <body>
 <div th:fragment="content">
-    <div class="grid">
-        <article>
-            <header>Saldo geral</header>
-            <h2 th:text="'R$ ' + ${#numbers.formatDecimal(dashboardData.totalBalance, 1, 'POINT', 2, 'COMMA')}"></h2>
-        </article>
-        <article>
-            <header>Todas as faturas</header>
-            <h2 th:text="'-R$ ' + ${#numbers.formatDecimal(dashboardData.totalInvoice, 1, 'POINT', 2, 'COMMA')}"
-                style="color: var(--pico-color-red-500);"></h2>
-        </article>
+    <div class="box has-background-light">
+        <p class="heading">Saldo geral</p>
+        <h1 class="title"
+            th:text="'R$ ' + ${#numbers.formatDecimal(dashboardData.totalBalance, 1, 'POINT', 2, 'COMMA')}"></h1>
     </div>
 
-    <article>
-        <header>
-            <hgroup>
-                <h3>Minhas contas</h3>
-                <p>Visão geral das suas contas e saldos.</p>
-            </hgroup>
-        </header>
+    <div class="box" style="margin-top: 2rem;">
+        <h3 class="title is-4">Minhas contas</h3>
         <div th:if="${#lists.isEmpty(dashboardData.accounts)}">
             <p>Nenhuma conta cadastrada.</p>
         </div>
         <div th:unless="${#lists.isEmpty(dashboardData.accounts)}">
-            <div th:each="account : ${dashboardData.accounts}"
-                 style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <div>
-                    <strong th:text="${account.name}">Conta Nu</strong><br/>
-                    <small th:text="${account.institution}">Conta conectada</small>
+            <div th:each="account : ${dashboardData.accounts}" class="media">
+                <div class="media-content">
+                    <strong th:text="${account.name}">Nome da Conta</strong><br/>
+                    <small th:text="${account.institution}">Instituição</small>
                 </div>
-                <strong th:text="'R$ ' + ${#numbers.formatDecimal(account.balance, 1, 'POINT', 2, 'COMMA')}"></strong>
+                <div class="media-right">
+                    <strong th:text="'R$ ' + ${#numbers.formatDecimal(account.balance, 1, 'POINT', 2, 'COMMA')}"></strong>
+                </div>
             </div>
         </div>
-        <footer>
-            <a href="#" role="button">Gerenciar contas</a>
-        </footer>
-    </article>
+    </div>
 
-    <article style="margin-top: 2rem;">
-        <header>
-            <hgroup>
-                <h3>Meus cartões</h3>
-                <p>Resumo dos seus cartões de crédito.</p>
-            </hgroup>
-        </header>
+    <div class="box" style="margin-top: 2rem;">
+        <h3 class="title is-4">Meus cartões</h3>
+        <p class="heading">Todas as faturas</p>
+        <h2 class="title is-5 has-text-danger"
+            th:text="'-R$ ' + ${#numbers.formatDecimal(dashboardData.totalInvoice, 1, 'POINT', 2, 'COMMA')}"></h2>
+        <hr>
         <div th:if="${#lists.isEmpty(dashboardData.creditCards)}">
             <p>Nenhum cartão cadastrado.</p>
         </div>
         <div th:unless="${#lists.isEmpty(dashboardData.creditCards)}">
-            <div th:each="card : ${dashboardData.creditCards}" style="margin-bottom: 2rem;">
-                <h5 th:text="${card.name}">Cartão Inter</h5>
-                <div class="grid">
-                    <div>
-                        <small>Disponível</small><br/>
-                        <strong th:text="'R$ ' + ${#numbers.formatDecimal(card.availableLimit, 1, 'POINT', 2, 'COMMA')}"></strong>
+            <div th:each="card : ${dashboardData.creditCards}" style="margin-bottom: 1.5rem;">
+                <h5 class="title is-5" th:text="${card.name}">Nome do Cartão</h5>
+                <div class="level">
+                    <div class="level-item has-text-centered">
+                        <div>
+                            <p class="heading">Disponível</p>
+                            <p class="title is-6"
+                               th:text="'R$ ' + ${#numbers.formatDecimal(card.availableLimit, 1, 'POINT', 2, 'COMMA')}"></p>
+                        </div>
                     </div>
-                    <div>
-                        <small>Fatura atual</small><br/>
-                        <strong th:text="'-R$ ' + ${#numbers.formatDecimal(card.currentInvoice, 1, 'POINT', 2, 'COMMA')}"
-                                style="color: var(--pico-color-red-500);"></strong>
+                    <div class="level-item has-text-centered">
+                        <div>
+                            <p class="heading">Fatura atual</p>
+                            <p class="title is-6 has-text-danger"
+                               th:text="'-R$ ' + ${#numbers.formatDecimal(card.currentInvoice, 1, 'POINT', 2, 'COMMA')}"></p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <footer>
-            <a href="#" role="button">Gerenciar cartões</a>
-        </footer>
-    </article>
+    </div>
 </div>
 </body>
 </html>

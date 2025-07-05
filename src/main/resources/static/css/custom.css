@@ -1,0 +1,93 @@
+/*
+* Custom styles for the Personal Finance App
+*/
+
+/* Add padding to the bottom of the body to prevent the fixed nav bar from hiding content */
+body {
+    padding-bottom: 80px !important;
+}
+
+/* Mobile Bottom Navigation Bar */
+.mobile-nav-items {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    background-color: white;
+    border-top: 1px solid #dbdbdb;
+}
+
+.mobile-nav-items .navbar-item {
+    flex-direction: column;
+    font-size: 1.25rem;
+}
+
+/* Floating Action Button (FAB) Styles */
+.fab-wrapper {
+    position: fixed;
+    bottom: 90px;
+    right: 30px;
+    z-index: 100;
+}
+
+.fab-main-button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #48c774; /* Bulma's primary green */
+    color: white;
+    border: none;
+    font-size: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+}
+
+.fab-main-button.is-active {
+    transform: rotate(45deg);
+}
+
+.fab-action-buttons {
+    position: absolute;
+    bottom: 70px;
+    right: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.2s, visibility 0.2s;
+}
+
+.fab-action-buttons.is-active {
+    visibility: visible;
+    opacity: 1;
+}
+
+.fab-action-button {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    color: #363636;
+    text-decoration: none;
+}
+
+.fab-action-button .fab-label {
+    background-color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    margin-right: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.fab-action-button i {
+    background-color: white;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}

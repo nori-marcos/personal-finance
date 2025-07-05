@@ -16,6 +16,9 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
   List<Transaction> findByPaymentDateBetween(LocalDate start, LocalDate end);
 
+  List<Transaction> findByUserEmailAndTransactionDateBetween(
+      String userEmail, LocalDate startDate, LocalDate endDate);
+
   List<Transaction> findByCreditCardIdAndTransactionDateBetween(
       Long creditCardId, LocalDate start, LocalDate end);
 }

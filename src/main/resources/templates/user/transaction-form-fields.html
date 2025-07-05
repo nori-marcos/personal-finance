@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<body>
+<div th:fragment="form">
+    <form id="transaction-form" th:object="${transaction}">
+        <div id="form-errors" class="notification is-danger is-hidden"></div>
+
+        <div class="field">
+            <label class="label">Tipo</label>
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select id="form-transaction-type" name="type" required>
+                        <option value="EXPENSE">Despesa</option>
+                        <option value="INCOME">Receita</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Valor</label>
+            <div class="control">
+                <input class="input" type="number" step="0.01" placeholder="R$ 0,00" name="amount" required>
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Descrição</label>
+            <div class="control">
+                <input class="input" type="text" placeholder="Ex: Salário, Almoço" name="description" required>
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Data</label>
+            <div class="control">
+                <input class="input" type="date" name="transactionDate" required>
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Conta</label>
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select name="account.id" required>
+                        <option value="">Selecione uma conta</option>
+                        <option th:each="acc : ${accounts}" th:value="${acc.id}" th:text="${acc.name}"></option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Categoria</label>
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select name="category.id" required>
+                        <option value="">Selecione uma categoria</option>
+                        <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <footer class="modal-card-foot" style="justify-content: flex-end;">
+            <button class="button" id="modal-cancel-button">Cancelar</button>
+            <button class="button is-success" type="submit" name="action" value="saveAndNew">Salvar e criar outra</button>
+            <button class="button is-primary" type="submit" name="action" value="save">Salvar</button>
+        </footer>
+    </form>
+</div>
+</body>
+</html>
