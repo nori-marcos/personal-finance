@@ -1,4 +1,4 @@
-package com.nori.personal_finance.configuration;
+package com.nori.personal_finance.configuration.starter;
 
 import static org.springframework.core.ResolvableType.forClass;
 

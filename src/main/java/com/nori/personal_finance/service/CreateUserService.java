@@ -1,6 +1,6 @@
 package com.nori.personal_finance.service;
 
-import com.nori.personal_finance.configuration.Handler;
+import com.nori.personal_finance.configuration.starter.Handler;
 import com.nori.personal_finance.dto.CreateUserRequest;
 import com.nori.personal_finance.model.User;
 import com.nori.personal_finance.repository.UserRepository;

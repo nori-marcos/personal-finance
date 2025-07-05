@@ -1,6 +1,6 @@
 package com.nori.personal_finance.controller;
 
-import com.nori.personal_finance.configuration.Mediator;
+import com.nori.personal_finance.configuration.starter.Mediator;
 import com.nori.personal_finance.dto.CreateUserRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
