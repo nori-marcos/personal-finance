@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<body>
+<header th:fragment="header" class="container">
+    <nav>
+        <ul>
+            <li><strong>Finanças Pessoais</strong></li>
+        </ul>
+        <ul>
+            <li>
+                <form th:action="@{/logout}" method="post">
+                    <button type.submit" class="secondary">Sair</button>
+                </form>
+            </li>
+        </ul>
+    </nav>
+</header>
+</body>
+</html>

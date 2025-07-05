@@ -1,7 +1,7 @@
 package com.nori.personal_finance.controller;
 
-import com.nori.personal_finance.configuration.starter.Mediator;
 import com.nori.personal_finance.dto.CreateUserRequest;
+import com.nori.personal_finance.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -15,13 +15,20 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 @RequiredArgsConstructor
 public class AuthenticationController {
-
-  private final Mediator mediator;
+  private final AuthenticationService authenticationService;
 
   @GetMapping("/")
+  public String rootRedirect(final Authentication authentication) {
+    if (authentication != null && authentication.isAuthenticated()) {
+      return "redirect:/dashboard";
+    }
+    return "redirect:/login";
+  }
+
+  @GetMapping("/login")
   public String userLoginPage(final Authentication authentication, final Model model) {
     if (authentication != null && authentication.isAuthenticated()) {
-      return "redirect:/user/dashboard";
+      return "redirect:/dashboard";
     }
     model.addAttribute("contentFragment", "user/login");
     return "layout";
@@ -36,7 +43,7 @@ public class AuthenticationController {
     return "layout";
   }
 
-  @PostMapping("/register/user")
+  @PostMapping("/register")
   public String processUserRegistration(
       @ModelAttribute("userRequest") final CreateUserRequest formSubmission,
       final BindingResult result,
@@ -50,7 +57,7 @@ public class AuthenticationController {
     }
 
     try {
-      mediator.handle(formSubmission, String.class);
+      authenticationService.createUser(formSubmission);
       redirectAttributes.addFlashAttribute("successMessage", "Cadastro realizado com sucesso!");
       return "redirect:/";
 

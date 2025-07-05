@@ -15,8 +15,6 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfiguration {
 
-  private static final String USER_LOGIN_URL = "/login/user";
-
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
@@ -26,33 +24,34 @@ public class SecurityConfiguration {
   @Order(1)
   public SecurityFilterChain userSecurityFilterChain(
       final HttpSecurity http, final UserDetailsService userDetailsService) throws Exception {
+
     return http.csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(
             auth ->
                 auth.requestMatchers(
                         "/",
+                        "/login",
+                        "/login?error=true",
+                        "/register",
+                        "/registration-success",
                         "/css/**",
-                        "/js/**",
-                        "/register/**",
-                        USER_LOGIN_URL,
-                        "/login/user?error=true",
-                        "/registration-success")
+                        "/js/**")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
         .userDetailsService(userDetailsService)
         .formLogin(
             form ->
-                form.loginPage(USER_LOGIN_URL)
-                    .loginProcessingUrl(USER_LOGIN_URL)
+                form.loginPage("/login")
+                    .loginProcessingUrl("/login")
                     .successHandler(
                         (request, response, authentication) -> response.sendRedirect("/dashboard"))
-                    .failureUrl("/login/user?error=true"))
+                    .failureUrl("/login?error=true"))
         .logout(
             logout ->
                 logout
                     .logoutUrl("/logout")
-                    .logoutSuccessUrl("/login/user?logout=true")
+                    .logoutSuccessUrl("/login?logout=true")
                     .invalidateHttpSession(true)
                     .deleteCookies("JSESSIONID"))
         .build();

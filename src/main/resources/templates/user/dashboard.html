@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="content">
+    <div class="grid">
+        <article>
+            <header>Saldo geral</header>
+            <h2 th:text="'R$ ' + ${#numbers.formatDecimal(dashboardData.totalBalance, 1, 'POINT', 2, 'COMMA')}"></h2>
+        </article>
+        <article>
+            <header>Todas as faturas</header>
+            <h2 th:text="'-R$ ' + ${#numbers.formatDecimal(dashboardData.totalInvoice, 1, 'POINT', 2, 'COMMA')}"
+                style="color: var(--pico-color-red-500);"></h2>
+        </article>
+    </div>
+
+    <article>
+        <header>
+            <hgroup>
+                <h3>Minhas contas</h3>
+                <p>Visão geral das suas contas e saldos.</p>
+            </hgroup>
+        </header>
+        <div th:if="${#lists.isEmpty(dashboardData.accounts)}">
+            <p>Nenhuma conta cadastrada.</p>
+        </div>
+        <div th:unless="${#lists.isEmpty(dashboardData.accounts)}">
+            <div th:each="account : ${dashboardData.accounts}"
+                 style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <div>
+                    <strong th:text="${account.name}">Conta Nu</strong><br/>
+                    <small th:text="${account.institution}">Conta conectada</small>
+                </div>
+                <strong th:text="'R$ ' + ${#numbers.formatDecimal(account.balance, 1, 'POINT', 2, 'COMMA')}"></strong>
+            </div>
+        </div>
+        <footer>
+            <a href="#" role="button">Gerenciar contas</a>
+        </footer>
+    </article>
+
+    <article style="margin-top: 2rem;">
+        <header>
+            <hgroup>
+                <h3>Meus cartões</h3>
+                <p>Resumo dos seus cartões de crédito.</p>
+            </hgroup>
+        </header>
+        <div th:if="${#lists.isEmpty(dashboardData.creditCards)}">
+            <p>Nenhum cartão cadastrado.</p>
+        </div>
+        <div th:unless="${#lists.isEmpty(dashboardData.creditCards)}">
+            <div th:each="card : ${dashboardData.creditCards}" style="margin-bottom: 2rem;">
+                <h5 th:text="${card.name}">Cartão Inter</h5>
+                <div class="grid">
+                    <div>
+                        <small>Disponível</small><br/>
+                        <strong th:text="'R$ ' + ${#numbers.formatDecimal(card.availableLimit, 1, 'POINT', 2, 'COMMA')}"></strong>
+                    </div>
+                    <div>
+                        <small>Fatura atual</small><br/>
+                        <strong th:text="'-R$ ' + ${#numbers.formatDecimal(card.currentInvoice, 1, 'POINT', 2, 'COMMA')}"
+                                style="color: var(--pico-color-red-500);"></strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <footer>
+            <a href="#" role="button">Gerenciar cartões</a>
+        </footer>
+    </article>
+</div>
+</body>
+</html>
