@@ -1,6 +1,8 @@
 package com.nori.personal_finance.controller;
 
 import com.nori.personal_finance.dto.CreateUserRequest;
+// You can use either AuthenticationService or Mediator, depending on your final design.
+// This example assumes you are using the AuthenticationService you provided.
 import com.nori.personal_finance.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -30,7 +32,7 @@ public class AuthenticationController {
     if (authentication != null && authentication.isAuthenticated()) {
       return "redirect:/dashboard";
     }
-    model.addAttribute("contentFragment", "user/login");
+    model.addAttribute("contentFragment", "authentication/login");
     return "layout";
   }
 
@@ -39,7 +41,7 @@ public class AuthenticationController {
     if (!model.containsAttribute("userRequest")) {
       model.addAttribute("userRequest", new CreateUserRequest("", ""));
     }
-    model.addAttribute("contentFragment", "user/register");
+    model.addAttribute("contentFragment", "authentication/register");
     return "layout";
   }
 

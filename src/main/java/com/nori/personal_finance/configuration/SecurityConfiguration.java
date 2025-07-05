@@ -1,3 +1,5 @@
+// src/main/java/com/nori/personal_finance/configuration/SecurityConfiguration.java
+
 package com.nori.personal_finance.configuration;
 
 import org.springframework.context.annotation.Bean;
@@ -15,6 +17,8 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfiguration {
 
+  private static final String LOGIN_URL = "/login";
+
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
@@ -24,36 +28,36 @@ public class SecurityConfiguration {
   @Order(1)
   public SecurityFilterChain userSecurityFilterChain(
       final HttpSecurity http, final UserDetailsService userDetailsService) throws Exception {
-
     return http.csrf(AbstractHttpConfigurer::disable)
-        .authorizeHttpRequests(
-            auth ->
-                auth.requestMatchers(
-                        "/",
-                        "/login",
-                        "/login?error=true",
-                        "/register",
-                        "/registration-success",
-                        "/css/**",
-                        "/js/**")
-                    .permitAll()
-                    .anyRequest()
-                    .authenticated())
-        .userDetailsService(userDetailsService)
-        .formLogin(
-            form ->
-                form.loginPage("/login")
-                    .loginProcessingUrl("/login")
-                    .successHandler(
-                        (request, response, authentication) -> response.sendRedirect("/dashboard"))
-                    .failureUrl("/login?error=true"))
-        .logout(
-            logout ->
-                logout
-                    .logoutUrl("/logout")
-                    .logoutSuccessUrl("/login?logout=true")
-                    .invalidateHttpSession(true)
-                    .deleteCookies("JSESSIONID"))
-        .build();
+               .authorizeHttpRequests(
+                   auth ->
+                       auth.requestMatchers(
+                               "/",
+                               "/css/**",
+                               "/js/**",
+                               "/register/**",
+                               LOGIN_URL, // Check this line
+                               LOGIN_URL + "?error=true",
+                               LOGIN_URL + "?logout=true",
+                               "/registration-success")
+                           .permitAll()
+                           .anyRequest()
+                           .authenticated())
+               .userDetailsService(userDetailsService)
+               .formLogin(
+                   form ->
+                       form.loginPage(LOGIN_URL) // Check this line
+                           .loginProcessingUrl(LOGIN_URL) // Check this line
+                           .successHandler(
+                               (request, response, authentication) -> response.sendRedirect("/dashboard"))
+                           .failureUrl(LOGIN_URL + "?error=true"))
+               .logout(
+                   logout ->
+                       logout
+                           .logoutUrl("/logout")
+                           .logoutSuccessUrl(LOGIN_URL + "?logout=true")
+                           .invalidateHttpSession(true)
+                           .deleteCookies("JSESSIONID"))
+               .build();
   }
 }

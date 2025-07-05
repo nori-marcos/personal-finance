@@ -8,7 +8,7 @@
 </head>
 <body>
 
-<main class="container" style="margin-top: 5rem; max-width: 400px;">
+<main th:fragment="content" class="container" style="margin-top: 5rem; max-width: 400px;">
     <h2>Criar Conta</h2>
 
     <form th:action="@{/register}" method="post" th:object="${userRequest}">
