@@ -10,10 +10,11 @@
                 <span th:text="${errorMessage}">Algo deu errado.</span>
             </h2>
             <p>
-                Por favor, verifique a URL ou volte para a página inicial.
+                Por favor, verifique a URL, tente novamente ou volte para a página anterior.
             </p>
             <div class="buttons is-centered" style="margin-top: 2rem;">
-                <a href="/" class="button is-primary">Ir para Página Inicial</a>
+                <a href="javascript:history.back()" class="button is-primary">Voltar à página anterior</a>
+                <a href="/" class="button is-light">Ir para a Página Inicial</a>
             </div>
         </div>
     </section>
