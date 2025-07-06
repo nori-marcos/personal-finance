@@ -49,13 +49,19 @@ public class DashboardService {
   private AccountView mapToAccountView(final Account account) {
     final BigDecimal balance = calculateAccountBalance(account.getId());
     return new AccountView(
-        account.getName(), account.getInstitution(), balance, account.getAccountType());
+        account.getId(),
+        account.getName(),
+        account.getInstitution(),
+        balance,
+        account.getAccountType());
   }
+
 
   private CreditCardView mapToCreditCardView(final CreditCard card) {
     final BigDecimal currentInvoice = calculateCurrentInvoice(card);
     final BigDecimal availableLimit = card.getLimitAmount().subtract(currentInvoice);
-    return new CreditCardView(card.getName(), availableLimit, currentInvoice);
+    // Pass the card's ID as the first argument
+    return new CreditCardView(card.getId(), card.getName(), availableLimit, currentInvoice);
   }
 
   private BigDecimal calculateAccountBalance(final Long accountId) {
@@ -69,7 +75,7 @@ public class DashboardService {
     final LocalDate today = LocalDate.now();
     final int closingDay = card.getClosingDay();
 
-    LocalDate lastClosingDate;
+    final LocalDate lastClosingDate;
 
     if (today.getDayOfMonth() > closingDay) {
       lastClosingDate = today.withDayOfMonth(closingDay);

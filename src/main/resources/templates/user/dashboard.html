@@ -18,25 +18,30 @@
                 <p>Nenhuma conta cadastrada.</p>
             </div>
             <div th:unless="${#lists.isEmpty(dashboardData.accounts)}">
-                <div th:each="account : ${dashboardData.accounts}" class="account-item">
-                    <div class="media">
-                        <div class="media-left">
-                           <span class="icon is-medium">
-                               <i th:if="${account.accountType.name() == 'SAVINGS_ACCOUNT'}" class="fa-solid fa-piggy-bank"></i>
-                               <i th:unless="${account.accountType.name() == 'SAVINGS_ACCOUNT'}" class="fa-solid fa-landmark"></i>
-                           </span>
-                        </div>
-                        <div class="media-content">
-                            <strong th:text="${account.name}">Nome da Conta</strong><br/>
-                            <small th:text="${account.institution}">Instituição</small>
-                        </div>
-                        <div class="media-right">
-                            <strong th:classappend="${account.balance.doubleValue() < 0 ? 'has-text-danger' : ''}"
-                                    th:text="'R$ ' + ${#numbers.formatDecimal(account.balance, 1, 'POINT', 2, 'COMMA')}">
-                            </strong>
+                <a th:each="account : ${dashboardData.accounts}" th:href="@{/accounts/{id}(id=${account.id})}"
+                   class="account-item-link">
+                    <div class="account-item">
+                        <div class="media">
+                            <div class="media-left">
+                               <span class="icon is-medium">
+                                   <i th:if="${account.accountType.name() == 'SAVINGS_ACCOUNT'}"
+                                      class="fa-solid fa-piggy-bank"></i>
+                                   <i th:unless="${account.accountType.name() == 'SAVINGS_ACCOUNT'}"
+                                      class="fa-solid fa-landmark"></i>
+                               </span>
+                            </div>
+                            <div class="media-content">
+                                <strong th:text="${account.name}">Nome da Conta</strong><br/>
+                                <small th:text="${account.institution}">Instituição</small>
+                            </div>
+                            <div class="media-right">
+                                <strong th:classappend="${account.balance.doubleValue() < 0 ? 'has-text-danger' : ''}"
+                                        th:text="'R$ ' + ${#numbers.formatDecimal(account.balance, 1, 'POINT', 2, 'COMMA')}">
+                                </strong>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
         </div>
         <footer class="card-footer">
@@ -54,31 +59,36 @@
                 <p>Nenhum cartão cadastrado.</p>
             </div>
             <div th:unless="${#lists.isEmpty(dashboardData.creditCards)}">
-                <div th:each="card : ${dashboardData.creditCards}" class="account-item">
-                    <div class="media">
-                        <div class="media-left">
-                            <span class="icon is-medium"><i class="fa-regular fa-credit-card"></i></span>
-                        </div>
-                        <div class="media-content">
-                            <p class="title is-5" th:text="${card.name}">Nome do Cartão</p>
-                        </div>
-                    </div>
-                    <div class="level is-mobile" style="margin-top: 0.75rem;">
-                        <div class="level-item has-text-centered">
-                            <div>
-                                <p class="heading">Disponível</p>
-                                <p class="title is-6" th:classappend="${card.availableLimit.doubleValue() < 0 ? 'has-text-danger' : ''}"
-                                   th:text="'R$ ' + ${#numbers.formatDecimal(card.availableLimit, 1, 'POINT', 2, 'COMMA')}"></p>
+                <a th:each="card : ${dashboardData.creditCards}" th:href="@{/cards/{id}(id=${card.id})}"
+                   class="account-item-link">
+                    <div class="account-item">
+                        <div class="media">
+                            <div class="media-left">
+                                <span class="icon is-medium"><i class="fa-regular fa-credit-card"></i></span>
+                            </div>
+                            <div class="media-content">
+                                <p class="title is-5" th:text="${card.name}">Nome do Cartão</p>
                             </div>
                         </div>
-                        <div class="level-item has-text-centered">
-                            <div>
-                                <p class="heading">Fatura atual</p>
-                                <p class="title is-6 has-text-danger" th:text="'-R$ ' + ${#numbers.formatDecimal(card.currentInvoice, 1, 'POINT', 2, 'COMMA')}"></p>
+                        <div class="level is-mobile" style="margin-top: 0.75rem;">
+                            <div class="level-item has-text-centered">
+                                <div>
+                                    <p class="heading">Disponível</p>
+                                    <p class="title is-6"
+                                       th:classappend="${card.availableLimit.doubleValue() < 0 ? 'has-text-danger' : ''}"
+                                       th:text="'R$ ' + ${#numbers.formatDecimal(card.availableLimit, 1, 'POINT', 2, 'COMMA')}"></p>
+                                </div>
+                            </div>
+                            <div class="level-item has-text-centered">
+                                <div>
+                                    <p class="heading">Fatura atual</p>
+                                    <p class="title is-6 has-text-danger"
+                                       th:text="'-R$ ' + ${#numbers.formatDecimal(card.currentInvoice, 1, 'POINT', 2, 'COMMA')}"></p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
         </div>
         <footer class="card-footer">
@@ -87,10 +97,8 @@
         </footer>
     </div>
 
-    <div class="modal" id="add-account-modal">
-    </div>
-    <div class="modal" id="add-card-modal">
-    </div>
+    <div class="modal" id="add-account-modal"></div>
+    <div class="modal" id="add-card-modal"></div>
 
 </div>
 </body>

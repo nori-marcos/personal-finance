@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<body>
+<div th:fragment="content">
+    <div class="level">
+        <div class="level-left">
+            <div>
+                <h1 class="title" th:text="${viewData.card.name}"></h1>
+                <h2 class="subtitle">Detalhes do Cartão de Crédito</h2>
+            </div>
+        </div>
+        <div class="level-right">
+            <form th:action="@{/cards/{id}/delete(id=${viewData.card.id})}" method="post"
+                  onsubmit="return confirm('Tem certeza que deseja excluir este cartão e TODAS as suas transações?');">
+                <button class="button is-danger" type="submit">Excluir Cartão</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="level is-mobile box">
+        <div class="level-item has-text-centered">
+            <div>
+                <p class="heading">Limite Total</p>
+                <p class="title is-5"
+                   th:text="'R$ ' + ${#numbers.formatDecimal(viewData.card.limitAmount, 1, 'POINT', 2, 'COMMA')}"></p>
+            </div>
+        </div>
+        <div class="level-item has-text-centered">
+            <div>
+                <p class="heading">Disponível</p>
+                <p class="title is-5"
+                   th:classappend="${viewData.availableLimit.doubleValue() < 0 ? 'has-text-danger' : ''}"
+                   th:text="'R$ ' + ${#numbers.formatDecimal(viewData.availableLimit, 1, 'POINT', 2, 'COMMA')}"></p>
+            </div>
+        </div>
+        <div class="level-item has-text-centered">
+            <div>
+                <p class="heading">Fatura Atual</p>
+                <p class="title is-5 has-text-danger"
+                   th:text="'-R$ ' + ${#numbers.formatDecimal(viewData.currentInvoice, 1, 'POINT', 2, 'COMMA')}"></p>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+    <h3 class="title is-4">Transações do Cartão</h3>
+
+    <div th:if="${#lists.isEmpty(viewData.transactions)}" class="box">
+        <p>Nenhuma transação encontrada para este cartão.</p>
+    </div>
+    <div class="box" th:each="transaction : ${viewData.transactions}">
+        <article class="media">
+            <div class="media-content"><p><strong th:text="${transaction.description}"></strong><br><small
+                    th:text="${#temporals.format(transaction.transactionDate, 'dd/MM/yyyy')}"></small></p></div>
+            <div class="media-right"><span class="has-text-danger"
+                                           th:text="'-R$ ' + ${#numbers.formatDecimal(transaction.amount, 1, 'POINT', 2, 'COMMA')}"></span>
+            </div>
+        </article>
+    </div>
+</div>
+</body>
+</html>

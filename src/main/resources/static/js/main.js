@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (document.getElementById('mobile-card-form-page') && isDesktop) {
             window.location.href = '/dashboard';
-            return;
+
         }
     };
 

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<body>
+<div th:fragment="content">
+    <div class="level">
+        <div class="level-left">
+            <div>
+                <h1 class="title" th:text="${account.name}">Nome da Conta</h1>
+                <h2 class="subtitle" th:text="${account.institution} + ' - Saldo: R$ ' + ${#numbers.formatDecimal(balance, 1, 'POINT', 2, 'COMMA')}"></h2>
+            </div>
+        </div>
+        <div class="level-right">
+            <form th:action="@{/accounts/{id}/delete(id=${account.id})}" method="post" onsubmit="return confirm('Tem certeza que deseja excluir esta conta e TODAS as suas transações? Esta ação não pode ser desfeita.');">
+                <button class="button is-danger" type="submit">Excluir Conta</button>
+            </form>
+        </div>
+    </div>
+
+    <hr>
+    <h3 class="title is-4">Transações da Conta</h3>
+
+    <div th:if="${#lists.isEmpty(transactions)}" class="box">
+        <p>Nenhuma transação encontrada para esta conta.</p>
+    </div>
+    <div class="box" th:each="transaction : ${transactions}">
+        <article class="media">
+            <div class="media-content">
+                <p>
+                    <strong th:text="${transaction.description}"></strong><br>
+                    <small th:text="${#temporals.format(transaction.transactionDate, 'dd/MM/yyyy')}"></small>
+                </p>
+            </div>
+            <div class="media-right">
+                <span th:if="${transaction.type.name() == 'INCOME'}" class="has-text-success" th:text="'+ R$ ' + ${#numbers.formatDecimal(transaction.amount, 1, 'POINT', 2, 'COMMA')}"></span>
+                <span th:if="${transaction.type.name() == 'EXPENSE'}" class="has-text-danger" th:text="'- R$ ' + ${#numbers.formatDecimal(transaction.amount, 1, 'POINT', 2, 'COMMA')}"></span>
+            </div>
+        </article>
+    </div>
+</div>
+</body>
+</html>

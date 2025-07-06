@@ -103,3 +103,11 @@ body {
     margin-bottom: 0;
     border-bottom: none; /* Remove border from the last item */
 }
+
+.account-item-link {
+    display: block;
+    color: inherit;
+}
+.account-item-link:hover {
+    color: inherit;
+}

@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class PersonalFinanceApplication {
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
     System.setProperty("spring.datasource.url", EnvConfig.get("DB_URL"));
     System.setProperty("spring.datasource.username", EnvConfig.get("DB_USER"));
     System.setProperty("spring.datasource.password", EnvConfig.get("DB_PASSWORD"));
