@@ -1,15 +1,9 @@
 package com.nori.personal_finance.service;
 
 import com.nori.personal_finance.dto.CreateTransferRequest;
-import com.nori.personal_finance.model.Account;
-import com.nori.personal_finance.model.Transaction;
-import com.nori.personal_finance.model.TransactionType;
-import com.nori.personal_finance.model.Transfer;
-import com.nori.personal_finance.model.User;
-import com.nori.personal_finance.repository.AccountRepository;
-import com.nori.personal_finance.repository.TransactionRepository;
-import com.nori.personal_finance.repository.TransferRepository;
-import com.nori.personal_finance.repository.UserRepository;
+import com.nori.personal_finance.model.*;
+import com.nori.personal_finance.repository.*;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +16,7 @@ public class TransferService {
   private final TransactionRepository transactionRepository;
   private final AccountRepository accountRepository;
   private final UserRepository userRepository;
+  private final CategoryRepository categoryRepository;
 
   @Transactional
   public void createTransfer(final CreateTransferRequest request, final String userEmail) {
@@ -44,27 +39,48 @@ public class TransferService {
             .findById(request.toAccountId())
             .orElseThrow(() -> new IllegalArgumentException("To Account not found"));
 
-    // 1. Create the Expense transaction from the source account
-    final Transaction expenseTransaction = new Transaction();
-    expenseTransaction.setDescription("Transfer to " + toAccount.getName());
-    expenseTransaction.setAmount(request.amount());
-    expenseTransaction.setTransactionDate(request.date());
-    expenseTransaction.setType(TransactionType.EXPENSE);
-    expenseTransaction.setAccount(fromAccount);
-    expenseTransaction.setUser(user);
-    transactionRepository.save(expenseTransaction);
+    final Category transferCategory =
+        categoryRepository
+            .findByNameAndUserEmail("Transferência", userEmail)
+            .orElseGet(
+                () -> {
+                  final Category newCategory = new Category();
+                  newCategory.setName("Transferência");
+                  newCategory.setColor("#808080");
+                  newCategory.setUser(user);
+                  return categoryRepository.save(newCategory);
+                });
 
-    // 2. Create the Income transaction to the destination account
-    final Transaction incomeTransaction = new Transaction();
-    incomeTransaction.setDescription("Transfer from " + fromAccount.getName());
-    incomeTransaction.setAmount(request.amount());
-    incomeTransaction.setTransactionDate(request.date());
-    incomeTransaction.setType(TransactionType.INCOME);
-    incomeTransaction.setAccount(toAccount);
-    incomeTransaction.setUser(user);
-    transactionRepository.save(incomeTransaction);
+    // Create both transactions first
+    final Transaction expense = new Transaction();
+    expense.setDescription("Transferência para " + toAccount.getName());
+    expense.setType(TransactionType.EXPENSE);
+    expense.setAccount(fromAccount);
 
-    // 3. (Optional but good practice) Log the transfer itself
+    final Transaction income = new Transaction();
+    income.setDescription("Transferência de " + fromAccount.getName());
+    income.setType(TransactionType.INCOME);
+    income.setAccount(toAccount);
+
+    // Set shared properties
+    List.of(expense, income)
+        .forEach(
+            t -> {
+              t.setAmount(request.amount());
+              t.setTransactionDate(request.date());
+              t.setUser(user);
+              t.setCategory(transferCategory);
+            });
+
+    // Link them together
+    expense.setLinkedTransaction(income);
+    income.setLinkedTransaction(expense);
+
+    // Save them both
+    transactionRepository.save(expense);
+    transactionRepository.save(income);
+
+    // Log the transfer event
     final Transfer transfer = new Transfer();
     transfer.setFromAccount(fromAccount);
     transfer.setToAccount(toAccount);

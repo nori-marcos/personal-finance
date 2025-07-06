@@ -39,7 +39,7 @@ public class AuthenticationService {
 
   private void createDefaultCategoriesForUser(final User user) {
     final List<String> defaultCategoryNames =
-        List.of("Entretenimento", "Estudo", "Transporte", "Casa", "Salário", "Compras");
+        List.of("Entretenimento", "Estudo", "Transporte", "Casa", "Salário", "Compras", "Transferência");
 
     final List<Category> defaultCategories =
         defaultCategoryNames.stream()
@@ -48,6 +48,7 @@ public class AuthenticationService {
                   final Category category = new Category();
                   category.setName(name);
                   category.setUser(user);
+                  category.setColor("#808080");
                   return category;
                 })
             .toList();

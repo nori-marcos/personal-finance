@@ -1,14 +1,7 @@
 package com.nori.personal_finance.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
@@ -44,6 +37,11 @@ public class Transaction {
   @ManyToOne private CreditCard creditCard;
 
   @ManyToOne private Category category;
+
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "linked_transaction_id", referencedColumnName = "id")
+  @JsonManagedReference
+  private Transaction linkedTransaction;
 
   @JoinColumn(name = "user_email", referencedColumnName = "email")
   @ManyToOne

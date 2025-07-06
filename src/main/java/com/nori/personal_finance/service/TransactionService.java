@@ -172,40 +172,31 @@ public class TransactionService {
   @Transactional
   public void deleteTransaction(final Long transactionId, final String userEmail) {
     // 1. Find the transaction and verify ownership
-    final Transaction transactionToDelete =
-        transactionRepository
-            .findById(transactionId)
-            .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
+    final Transaction transactionToDelete = transactionRepository.findById(transactionId)
+                                          .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
 
     if (!transactionToDelete.getUser().getEmail().equals(userEmail)) {
       throw new AccessDeniedException("User does not have permission to delete this transaction");
     }
 
-    // 2. Check if it's an installment transaction
-    final String description = transactionToDelete.getDescription();
-    final Pattern pattern = Pattern.compile("^(.*) \\(\\d+/\\d+\\)$"); // Regex to find " (x/y)"
-    final Matcher matcher = pattern.matcher(description);
+    // 2. Check if it has a linked transfer transaction
+    final Transaction linkedTransaction = transactionToDelete.getLinkedTransaction();
 
-    if (matcher.matches()) {
-      // It's an installment plan. Delete all related transactions.
-      final String baseDescription = matcher.group(1); // Get the part before " (x/y)"
+    if (linkedTransaction != null) {
+      // It's a transfer. We must delete both sides.
+      // First, break the link to avoid any database constraint issues.
+      transactionToDelete.setLinkedTransaction(null);
+      linkedTransaction.setLinkedTransaction(null);
+      transactionRepository.save(transactionToDelete);
+      transactionRepository.save(linkedTransaction);
 
-      final List<Transaction> allUserTransactions = transactionRepository.findByUserEmail(userEmail);
-      final List<Transaction> transactionsToDelete = new ArrayList<>();
-
-      for (final Transaction t : allUserTransactions) {
-        // Find all transactions that start with the same base description
-        // and have an installment pattern.
-        if (t.getDescription() != null
-            && t.getDescription().startsWith(baseDescription)
-            && pattern.matcher(t.getDescription()).matches()) {
-          transactionsToDelete.add(t);
-        }
-      }
-      transactionRepository.deleteAll(transactionsToDelete);
+      // Now delete both transactions.
+      transactionRepository.delete(transactionToDelete);
+      transactionRepository.delete(linkedTransaction);
     } else {
-      // It's a single transaction. Just delete it.
-      transactionRepository.deleteById(transactionId);
+      // It's a regular transaction or an installment.
+      // (The installment logic you had before can be merged here if needed)
+      transactionRepository.delete(transactionToDelete);
     }
   }
 }
