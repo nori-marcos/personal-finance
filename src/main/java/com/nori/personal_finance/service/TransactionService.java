@@ -18,7 +18,6 @@ import com.nori.personal_finance.repository.TransactionRepository;
 import com.nori.personal_finance.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
@@ -101,7 +100,7 @@ public class TransactionService {
     if (installments == null || installments <= 1) {
       final Transaction transaction = new Transaction();
       transaction.setDescription(request.description());
-      transaction.setAmount(request.amount());
+      transaction.setAmount(request.totalOrInstallmentAmount());
       transaction.setTransactionDate(request.transactionDate());
       transaction.setType(TransactionType.EXPENSE);
       transaction.setCreditCard(card);
@@ -111,24 +110,11 @@ public class TransactionService {
     }
     // Case 2: Installment plan
     else {
-      final BigDecimal totalAmount = request.amount();
-      // Calculate the value of each installment, rounded to 2 decimal places
-      final BigDecimal installmentAmount =
-          totalAmount.divide(new BigDecimal(installments), 2, RoundingMode.HALF_UP);
-
-      BigDecimal sumOfInstallments = BigDecimal.ZERO;
+      final BigDecimal installmentAmount = request.totalOrInstallmentAmount();
 
       for (int i = 0; i < installments; i++) {
         final Transaction transaction = new Transaction();
-
-        // For the last installment, adjust the amount to prevent rounding errors
-        if (i == installments - 1) {
-          transaction.setAmount(totalAmount.subtract(sumOfInstallments));
-        } else {
-          transaction.setAmount(installmentAmount);
-          sumOfInstallments = sumOfInstallments.add(installmentAmount);
-        }
-
+        transaction.setAmount(installmentAmount);
         // Set the description to include the installment number, e.g., "Phone (1/12)"
         transaction.setDescription(
             String.format("%s (%d/%d)", request.description(), i + 1, installments));

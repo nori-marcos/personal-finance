@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record CreateCreditCardExpenseRequest(
-    BigDecimal amount,
+    BigDecimal totalOrInstallmentAmount,
     String description,
     LocalDate transactionDate,
     Long categoryId,
