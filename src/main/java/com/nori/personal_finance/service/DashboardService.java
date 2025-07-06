@@ -6,15 +6,13 @@ import com.nori.personal_finance.dto.DashboardView;
 import com.nori.personal_finance.dto.UpcomingBillView;
 import com.nori.personal_finance.model.*;
 import com.nori.personal_finance.repository.AccountRepository;
-import com.nori.personal_finance.repository.CreditCardRespository;
+import com.nori.personal_finance.repository.CreditCardRepository;
 import com.nori.personal_finance.repository.TransactionRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,10 +21,10 @@ import org.springframework.stereotype.Service;
 public class DashboardService {
 
   private final AccountRepository accountRepository;
-  private final CreditCardRespository creditCardRepository;
+  private final CreditCardRepository creditCardRepository;
   private final TransactionRepository transactionRepository;
 
-  public List<Account> findByUserEmail(String userEmail) {
+  public List<Account> findByUserEmail(final String userEmail) {
     return accountRepository.findByUserEmail(userEmail);
   }
 
@@ -36,84 +34,67 @@ public class DashboardService {
     final List<CreditCard> userCreditCards = creditCardRepository.findByUserEmail(userEmail);
 
     final List<AccountView> accountViews =
-        userAccounts.stream().map(this::mapToAccountView).collect(Collectors.toList());
-    final List<CreditCardView> creditCardViews =
-        userCreditCards.stream().map(this::mapToCreditCardView).collect(Collectors.toList());
+        userAccounts.stream().map(this::mapToAccountView).toList();
 
-    // --- METRIC 1: Saldo Geral (Total in Accounts) ---
-    final BigDecimal saldoGeral =
+    final List<CreditCardView> creditCardViews =
+        userCreditCards.stream().map(this::mapToCreditCardView).toList();
+
+    // --- METRIC 1: Dinheiro em Conta (Total in Accounts) ---
+    final BigDecimal totalInAccounts =
         accountViews.stream().map(AccountView::balance).reduce(BigDecimal.ZERO, BigDecimal::add);
 
-    // --- METRIC 2: Dívida Geral (Total Debt) ---
-    final BigDecimal dividaGeral = calculateTotalDebt(userEmail, userCreditCards);
+    // --- METRIC 2: Dívida a Quitar (Total Future Debt) ---
+    final BigDecimal totalFutureDebt = calculateTotalFutureDebt(userEmail);
 
-    // --- METRIC 3: Dívida do Mês (Monthly Debt) ---
-    final BigDecimal dividaDoMes = calculateMonthlyDebt(userEmail, userCreditCards);
+    // --- METRIC 3: Saldo do Mês (Monthly Balance) ---
+    final BigDecimal currentMonthBalance = calculateMonthlyBalanceToDate(userEmail);
 
     // --- Other view data ---
     final List<UpcomingBillView> upcomingBills = getUpcomingBills(userCreditCards);
 
     return new DashboardView(
-        saldoGeral, dividaDoMes, dividaGeral, accountViews, creditCardViews, upcomingBills);
+        totalInAccounts,
+        currentMonthBalance,
+        totalFutureDebt,
+        accountViews,
+        creditCardViews,
+        upcomingBills);
   }
 
-  private BigDecimal calculateTotalDebt(
-      final String userEmail, final List<CreditCard> userCreditCards) {
-    final YearMonth currentMonth = YearMonth.now();
+  private BigDecimal calculateTotalFutureDebt(final String userEmail) {
     final List<Transaction> accountExpenses =
-        transactionRepository.findByUserEmailAndAccountIsNotNullAndTypeAndTransactionDateBetween(
-            userEmail, TransactionType.EXPENSE, currentMonth.atDay(1), currentMonth.atEndOfMonth());
-    final BigDecimal monthlyAccountExpenses =
+        transactionRepository.findByUserEmailAndTypeAndTransactionDateGreaterThanEqual(
+            userEmail, TransactionType.EXPENSE, LocalDate.now());
+    final BigDecimal futureAccountExpenses =
         accountExpenses.stream()
             .map(Transaction::getAmount)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-    BigDecimal totalCreditCardDebt = BigDecimal.ZERO;
-    for (final CreditCard card : userCreditCards) {
-      final List<Transaction> cardTransactions =
-          transactionRepository.findByCreditCardId(card.getId());
-      final BigDecimal cardNetBalance =
-          cardTransactions.stream()
-              .map(
-                  t ->
-                      t.getType() == TransactionType.EXPENSE
-                          ? t.getAmount()
-                          : t.getAmount().negate())
-              .reduce(BigDecimal.ZERO, BigDecimal::add);
-      if (cardNetBalance.compareTo(BigDecimal.ZERO) > 0) {
-        totalCreditCardDebt = totalCreditCardDebt.add(cardNetBalance);
-      }
-    }
-    return monthlyAccountExpenses.add(totalCreditCardDebt);
+    return futureAccountExpenses;
   }
 
-  private BigDecimal calculateMonthlyDebt(
-      final String userEmail, final List<CreditCard> userCreditCards) {
-    final YearMonth currentMonth = YearMonth.now();
-    // Get account expenses for the current month
-    final List<Transaction> accountExpenses =
-        transactionRepository.findByUserEmailAndAccountIsNotNullAndTypeAndTransactionDateBetween(
-            userEmail, TransactionType.EXPENSE, currentMonth.atDay(1), currentMonth.atEndOfMonth());
-    final BigDecimal monthlyAccountExpenses =
-        accountExpenses.stream()
+  private BigDecimal calculateMonthlyBalanceToDate(final String userEmail) {
+    final LocalDate today = LocalDate.now();
+    final LocalDate startOfMonth = today.withDayOfMonth(1);
+
+    final List<Transaction> transactionsThisMonth =
+        transactionRepository.findByUserEmailAndTransactionDateBetween(
+            userEmail, startOfMonth, today);
+
+    final BigDecimal incomeThisMonth =
+        transactionsThisMonth.stream()
+            .filter(t -> t.getType() == TransactionType.INCOME)
             .map(Transaction::getAmount)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-    // Get credit card invoices due this month
-    BigDecimal monthlyCardInvoices = BigDecimal.ZERO;
-    for (final CreditCard card : userCreditCards) {
-      final LocalDate today = LocalDate.now();
-      final LocalDate dueDate =
-          today.getDayOfMonth() <= card.getClosingDay()
-              ? today.withDayOfMonth(card.getDueDay())
-              : today.plusMonths(1).withDayOfMonth(card.getDueDay());
+    final BigDecimal expenseThisMonth =
+        transactionsThisMonth.stream()
+            .filter(t -> t.getType() == TransactionType.EXPENSE)
+            .map(Transaction::getAmount)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-      if (YearMonth.from(dueDate).equals(currentMonth)) {
-        monthlyCardInvoices = monthlyCardInvoices.add(calculateCurrentInvoice(card));
-      }
-    }
-    return monthlyAccountExpenses.add(monthlyCardInvoices);
+    return incomeThisMonth.subtract(expenseThisMonth);
   }
+
 
   private List<UpcomingBillView> getUpcomingBills(final List<CreditCard> userCreditCards) {
     final List<UpcomingBillView> upcomingBills = new ArrayList<>();

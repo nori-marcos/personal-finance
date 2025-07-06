@@ -34,4 +34,11 @@ public class TransferController {
     transferService.createTransfer(request, principal.getName());
     return "redirect:/transactions";
   }
+
+  @GetMapping("/new-form")
+  public String getNewTransferForm(final Model model, final Principal principal) {
+    model.addAttribute("accounts", accountRepository.findByUserEmail(principal.getName()));
+    model.addAttribute("transferRequest", new CreateTransferRequest(null, null, null, null, null));
+    return "user/transfer-form :: content";
+  }
 }

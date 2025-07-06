@@ -34,8 +34,10 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
   List<Transaction> findByCategoryId(Long categoryId);
 
-  List<Transaction> findByUserEmailAndAccountIsNotNullAndTypeAndTransactionDateBetween(
+  List<Transaction> findByUserEmailAndTypeAndTransactionDateBetween(
       String userEmail, TransactionType type, LocalDate startDate, LocalDate endDate);
+
+  List<Transaction> findByUserEmailAndTypeAndTransactionDateGreaterThanEqual(String userEmail, TransactionType type, LocalDate startDate);
 
   @Transactional
   void deleteAllByUserEmail(String userEmail);

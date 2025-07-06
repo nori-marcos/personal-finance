@@ -13,7 +13,7 @@ import com.nori.personal_finance.model.TransactionType;
 import com.nori.personal_finance.model.User;
 import com.nori.personal_finance.repository.AccountRepository;
 import com.nori.personal_finance.repository.CategoryRepository;
-import com.nori.personal_finance.repository.CreditCardRespository;
+import com.nori.personal_finance.repository.CreditCardRepository;
 import com.nori.personal_finance.repository.TransactionRepository;
 import com.nori.personal_finance.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -34,7 +34,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class TransactionService {
 
-  private final CreditCardRespository creditCardRepository;
+  private final CreditCardRepository creditCardRepository;
   private final TransactionRepository transactionRepository;
   private final AccountRepository accountRepository;
   private final CategoryRepository categoryRepository;

@@ -61,7 +61,7 @@ public class AccountController {
   }
 
   @GetMapping
-  public String listAccounts(Model model, Principal principal) {
+  public String listAccounts(final Model model, final Principal principal) {
     model.addAttribute("accounts", accountService.findByUserEmail(principal.getName()));
     model.addAttribute("contentFragment", "user/account-list");
     return "layout";

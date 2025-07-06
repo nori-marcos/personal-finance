@@ -6,7 +6,9 @@ import com.nori.personal_finance.dto.MonthlyTransactionsView;
 import com.nori.personal_finance.dto.TransactionFormView;
 import com.nori.personal_finance.model.Transaction;
 import com.nori.personal_finance.model.TransactionType;
+import com.nori.personal_finance.repository.CategoryRepository;
 import com.nori.personal_finance.service.TransactionService;
+import com.nori.personal_finance.repository.CreditCardRepository;
 import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -24,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class TransactionController {
 
   private final TransactionService transactionService;
+  private final CreditCardRepository creditCardRepository;
+  private final CategoryRepository categoryRepository;
 
   @GetMapping
   public String transactionsPage(
@@ -98,5 +102,13 @@ public class TransactionController {
     transactionService.deleteTransaction(id, principal.getName());
     // Redirect back to the main transactions list
     return "redirect:/transactions";
+  }
+
+  @GetMapping("/new-form/credit-card")
+  public String getNewCreditCardExpenseForm(final Model model, final Principal principal) {
+    model.addAttribute("expenseRequest", new CreateCreditCardExpenseRequest(null, null, null, null, null, null));
+    model.addAttribute("creditCards", creditCardRepository.findByUserEmail(principal.getName()));
+    model.addAttribute("categories", categoryRepository.findByUserEmail(principal.getName()));
+    return "user/credit-card-expense-form :: content";
   }
 }

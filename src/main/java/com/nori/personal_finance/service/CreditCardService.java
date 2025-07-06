@@ -6,7 +6,7 @@ import com.nori.personal_finance.model.CreditCard;
 import com.nori.personal_finance.model.Transaction;
 import com.nori.personal_finance.model.TransactionType;
 import com.nori.personal_finance.model.User;
-import com.nori.personal_finance.repository.CreditCardRespository;
+import com.nori.personal_finance.repository.CreditCardRepository;
 import com.nori.personal_finance.repository.TransactionRepository;
 import com.nori.personal_finance.repository.UserRepository;
 import java.math.BigDecimal;
@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CreditCardService {
 
-  private final CreditCardRespository creditCardRepository;
+  private final CreditCardRepository creditCardRepository;
   private final UserRepository userRepository;
   private final TransactionRepository transactionRepository;
 

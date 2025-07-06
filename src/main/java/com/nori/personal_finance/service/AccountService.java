@@ -109,7 +109,7 @@ public class AccountService {
     return new AccountDetailsView(account, transactions, balance);
   }
 
-  public List<Account> findByUserEmail(String userEmail) {
+  public List<Account> findByUserEmail(final String userEmail) {
     return accountRepository.findByUserEmail(userEmail);
   }
 }

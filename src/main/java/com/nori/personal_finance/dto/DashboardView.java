@@ -5,9 +5,9 @@ import java.util.List;
 
 public record DashboardView(
     // New, clearer metric names
-    BigDecimal saldoGeral,
-    BigDecimal dividaDoMes,
-    BigDecimal dividaGeral,
+    BigDecimal totalInAccounts,
+    BigDecimal currentMonthBalance,
+    BigDecimal totalFutureDebt,
 
     // Existing lists for the cards below
     List<AccountView> accounts,

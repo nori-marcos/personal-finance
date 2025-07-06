@@ -6,24 +6,25 @@
     <div class="columns has-text-centered">
         <div class="column">
             <div class="box">
-                <p class="heading">Saldo em Contas</p>
+                <p class="heading">Total em Contas</p>
                 <p class="title"
-                   th:classappend="${dashboardData.saldoGeral.doubleValue() < 0 ? 'has-text-danger' : 'has-text-success'}"
-                   th:text="'R$ ' + ${#numbers.formatDecimal(dashboardData.saldoGeral, 1, 'POINT', 2, 'COMMA')}"></p>
+                   th:classappend="${dashboardData.totalInAccounts.doubleValue() < 0 ? 'has-text-danger' : 'has-text-success'}"
+                   th:text="'R$ ' + ${#numbers.formatDecimal(dashboardData.totalInAccounts, 1, 'POINT', 2, 'COMMA')}"></p>
             </div>
         </div>
         <div class="column">
             <div class="box">
-                <p class="heading">Dívida do Mês</p>
-                <p class="title has-text-warning"
-                   th:text="'-R$ ' + ${#numbers.formatDecimal(dashboardData.dividaDoMes, 1, 'POINT', 2, 'COMMA')}"></p>
+                <p class="heading">Saldo do Mês</p>
+                <p class="title"
+                   th:classappend="${dashboardData.currentMonthBalance.doubleValue() < 0 ? 'has-text-danger' : 'has-text-success'}"
+                   th:text="'R$ ' + ${#numbers.formatDecimal(dashboardData.currentMonthBalance, 1, 'POINT', 2, 'COMMA')}"></p>
             </div>
         </div>
         <div class="column">
             <div class="box">
-                <p class="heading">Dívida Geral</p>
+                <p class="heading">Dívida a Quitar</p>
                 <p class="title has-text-danger"
-                   th:text="'-R$ ' + ${#numbers.formatDecimal(dashboardData.dividaGeral, 1, 'POINT', 2, 'COMMA')}"></p>
+                   th:text="'-R$ ' + ${#numbers.formatDecimal(dashboardData.totalFutureDebt, 1, 'POINT', 2, 'COMMA')}"></p>
             </div>
         </div>
     </div>

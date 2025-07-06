@@ -5,7 +5,7 @@ import com.nori.personal_finance.model.Category;
 import com.nori.personal_finance.model.User;
 import com.nori.personal_finance.repository.AccountRepository;
 import com.nori.personal_finance.repository.CategoryRepository;
-import com.nori.personal_finance.repository.CreditCardRespository;
+import com.nori.personal_finance.repository.CreditCardRepository;
 import com.nori.personal_finance.repository.TransactionRepository;
 import com.nori.personal_finance.repository.TransferRepository;
 import com.nori.personal_finance.repository.UserRepository;
@@ -23,7 +23,7 @@ public class AuthenticationService {
   private final CategoryRepository categoryRepository;
   private final TransactionRepository transactionRepository;
   private final TransferRepository transferRepository;
-  private final CreditCardRespository creditCardRepository;
+  private final CreditCardRepository creditCardRepository;
   private final AccountRepository accountRepository;
 
   public String createUser(final CreateUserRequest request) {
