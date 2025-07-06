@@ -48,7 +48,8 @@ public class DashboardService {
 
   private AccountView mapToAccountView(final Account account) {
     final BigDecimal balance = calculateAccountBalance(account.getId());
-    return new AccountView(account.getName(), account.getInstitution(), balance);
+    return new AccountView(
+        account.getName(), account.getInstitution(), balance, account.getAccountType());
   }
 
   private CreditCardView mapToCreditCardView(final CreditCard card) {

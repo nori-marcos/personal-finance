@@ -1,5 +1,6 @@
 package com.nori.personal_finance.controller;
 
+import com.nori.personal_finance.dto.CreateAccountRequest;
 import com.nori.personal_finance.model.Account;
 import com.nori.personal_finance.model.AccountType;
 import com.nori.personal_finance.service.AccountService;
@@ -38,8 +39,8 @@ public class AccountController {
 
   // Processes the form submission
   @PostMapping
-  public String processNewAccount(@ModelAttribute Account account, Principal principal) {
-    accountService.createAccount(account, principal.getName());
+  public String processNewAccount(@ModelAttribute CreateAccountRequest request, Principal principal) {
+    accountService.createAccount(request, principal.getName());
     return "redirect:/dashboard";
   }
 }
