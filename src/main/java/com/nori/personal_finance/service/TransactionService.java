@@ -67,29 +67,29 @@ public class TransactionService {
     transactionRepository.save(transaction);
   }
 
-  public CreditCardExpenseFormView getCreditCardExpenseFormData(String userEmail) {
-    List<CreditCard> creditCards = creditCardRepository.findByUserEmail(userEmail);
-    List<Category> categories = categoryRepository.findByUserEmail(userEmail);
+  public CreditCardExpenseFormView getCreditCardExpenseFormData(final String userEmail) {
+    final List<CreditCard> creditCards = creditCardRepository.findByUserEmail(userEmail);
+    final List<Category> categories = categoryRepository.findByUserEmail(userEmail);
     return new CreditCardExpenseFormView(creditCards, categories);
   }
 
-  public void createCreditCardExpense(CreateCreditCardExpenseRequest request, String userEmail) {
-    User user =
+  public void createCreditCardExpense(final CreateCreditCardExpenseRequest request, final String userEmail) {
+    final User user =
         userRepository
             .findByEmail(userEmail)
             .orElseThrow(() -> new IllegalStateException("User not found"));
 
-    CreditCard card =
+    final CreditCard card =
         creditCardRepository
             .findById(request.creditCardId())
             .orElseThrow(() -> new IllegalArgumentException("Credit Card not found"));
 
-    Category category =
+    final Category category =
         categoryRepository
             .findById(request.categoryId())
             .orElseThrow(() -> new IllegalArgumentException("Category not found"));
 
-    Transaction transaction = new Transaction();
+    final Transaction transaction = new Transaction();
     transaction.setDescription(request.description());
     transaction.setAmount(request.amount());
     transaction.setTransactionDate(request.transactionDate());
@@ -102,24 +102,24 @@ public class TransactionService {
   }
 
   @Transactional
-  public void createCardPayment(CreateCardPaymentRequest request, String userEmail) {
-    User user =
+  public void createCardPayment(final CreateCardPaymentRequest request, final String userEmail) {
+    final User user =
         userRepository
             .findByEmail(userEmail)
             .orElseThrow(() -> new IllegalStateException("User not found"));
 
-    Account fromAccount =
+    final Account fromAccount =
         accountRepository
             .findById(request.fromAccountId())
             .orElseThrow(() -> new IllegalArgumentException("Source account not found"));
 
-    CreditCard card =
+    final CreditCard card =
         creditCardRepository
             .findById(request.creditCardId())
             .orElseThrow(() -> new IllegalArgumentException("Credit card not found"));
 
     // 1. Create the Expense from the bank account
-    Transaction expense = new Transaction();
+    final Transaction expense = new Transaction();
     expense.setDescription("Pagamento da fatura: " + card.getName());
     expense.setAmount(request.amount());
     expense.setTransactionDate(request.date());
@@ -129,7 +129,7 @@ public class TransactionService {
     transactionRepository.save(expense);
 
     // 2. Create an "Income" transaction for the credit card to balance it out
-    Transaction payment = new Transaction();
+    final Transaction payment = new Transaction();
     payment.setDescription("Pagamento recebido da conta: " + fromAccount.getName());
     payment.setAmount(request.amount());
     payment.setTransactionDate(request.date());

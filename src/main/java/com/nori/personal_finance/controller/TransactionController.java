@@ -73,8 +73,8 @@ public class TransactionController {
   }
 
   @GetMapping("/new/credit-card")
-  public String showNewCreditCardExpenseForm(Model model, Principal principal) {
-    CreditCardExpenseFormView formData =
+  public String showNewCreditCardExpenseForm(final Model model, final Principal principal) {
+    final CreditCardExpenseFormView formData =
         transactionService.getCreditCardExpenseFormData(principal.getName());
     model.addAttribute(
         "expenseRequest", new CreateCreditCardExpenseRequest(null, null, null, null, null));
@@ -87,7 +87,7 @@ public class TransactionController {
   // NEW: Process the credit card expense form
   @PostMapping("/credit-card")
   public String processNewCreditCardExpense(
-      @ModelAttribute CreateCreditCardExpenseRequest request, Principal principal) {
+      @ModelAttribute final CreateCreditCardExpenseRequest request, final Principal principal) {
     transactionService.createCreditCardExpense(request, principal.getName());
     return "redirect:/transactions";
   }

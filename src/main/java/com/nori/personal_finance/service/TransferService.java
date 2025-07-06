@@ -24,28 +24,28 @@ public class TransferService {
   private final UserRepository userRepository;
 
   @Transactional
-  public void createTransfer(CreateTransferRequest request, String userEmail) {
+  public void createTransfer(final CreateTransferRequest request, final String userEmail) {
     if (request.fromAccountId().equals(request.toAccountId())) {
       throw new IllegalArgumentException("From and To accounts cannot be the same.");
     }
 
-    User user =
+    final User user =
         userRepository
             .findByEmail(userEmail)
             .orElseThrow(() -> new IllegalStateException("User not found"));
 
-    Account fromAccount =
+    final Account fromAccount =
         accountRepository
             .findById(request.fromAccountId())
             .orElseThrow(() -> new IllegalArgumentException("From Account not found"));
 
-    Account toAccount =
+    final Account toAccount =
         accountRepository
             .findById(request.toAccountId())
             .orElseThrow(() -> new IllegalArgumentException("To Account not found"));
 
     // 1. Create the Expense transaction from the source account
-    Transaction expenseTransaction = new Transaction();
+    final Transaction expenseTransaction = new Transaction();
     expenseTransaction.setDescription("Transfer to " + toAccount.getName());
     expenseTransaction.setAmount(request.amount());
     expenseTransaction.setTransactionDate(request.date());
@@ -55,7 +55,7 @@ public class TransferService {
     transactionRepository.save(expenseTransaction);
 
     // 2. Create the Income transaction to the destination account
-    Transaction incomeTransaction = new Transaction();
+    final Transaction incomeTransaction = new Transaction();
     incomeTransaction.setDescription("Transfer from " + fromAccount.getName());
     incomeTransaction.setAmount(request.amount());
     incomeTransaction.setTransactionDate(request.date());
@@ -65,7 +65,7 @@ public class TransferService {
     transactionRepository.save(incomeTransaction);
 
     // 3. (Optional but good practice) Log the transfer itself
-    Transfer transfer = new Transfer();
+    final Transfer transfer = new Transfer();
     transfer.setFromAccount(fromAccount);
     transfer.setToAccount(toAccount);
     transfer.setAmount(request.amount());

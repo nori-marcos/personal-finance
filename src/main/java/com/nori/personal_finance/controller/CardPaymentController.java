@@ -23,8 +23,8 @@ public class CardPaymentController {
   private final CreditCardRespository creditCardRepository;
 
   @GetMapping("/new")
-  public String showNewPaymentForm(Model model, Principal principal) {
-    String userEmail = principal.getName();
+  public String showNewPaymentForm(final Model model, final Principal principal) {
+    final String userEmail = principal.getName();
     model.addAttribute("paymentRequest", new CreateCardPaymentRequest(null, null, null, null));
     model.addAttribute("accounts", accountRepository.findByUserEmail(userEmail));
     model.addAttribute("creditCards", creditCardRepository.findByUserEmail(userEmail));
@@ -34,7 +34,7 @@ public class CardPaymentController {
 
   @PostMapping
   public String processNewPayment(
-      @ModelAttribute CreateCardPaymentRequest request, Principal principal) {
+      @ModelAttribute final CreateCardPaymentRequest request, final Principal principal) {
     transactionService.createCardPayment(request, principal.getName());
     return "redirect:/transactions";
   }

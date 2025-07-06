@@ -7,4 +7,5 @@ public record DashboardView(
     BigDecimal totalBalance,
     List<AccountView> accounts,
     BigDecimal totalInvoice,
-    List<CreditCardView> creditCards) {}
+    List<CreditCardView> creditCards,
+    List<UpcomingBillView> upcomingBills) {}

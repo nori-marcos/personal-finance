@@ -9,6 +9,28 @@
             th:text="'R$ ' + ${#numbers.formatDecimal(dashboardData.totalBalance, 1, 'POINT', 2, 'COMMA')}"></h1>
     </div>
 
+    <div class="card" style="margin-top: 2rem;" th:if="${!#lists.isEmpty(dashboardData.upcomingBills)}">
+        <header class="card-header">
+            <p class="card-header-title">Próximas Faturas</p>
+        </header>
+        <div class="card-content">
+            <div th:each="bill : ${dashboardData.upcomingBills}" class="account-item">
+                <div class="media">
+                    <div class="media-left">
+                        <span class="icon is-medium"><i class="fa-solid fa-file-invoice-dollar"></i></span>
+                    </div>
+                    <div class="media-content">
+                        <strong th:text="${bill.cardName}"></strong><br>
+                        <small th:text="'Vence em ' + ${bill.daysUntilDue} + ' dias (' + ${#temporals.format(bill.dueDate, 'dd/MM')} + ')'"></small>
+                    </div>
+                    <div class="media-right">
+                        <strong class="has-text-danger"
+                                th:text="'-R$ ' + ${#numbers.formatDecimal(bill.amount, 1, 'POINT', 2, 'COMMA')}"></strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="card" style="margin-top: 2rem;">
         <header class="card-header">
             <p class="card-header-title">Minhas Contas</p>

@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (document.getElementById('mobile-card-payment-form-page') && isDesktop) {
             window.location.href = '/dashboard';
-            return;
+
         }
     };
 

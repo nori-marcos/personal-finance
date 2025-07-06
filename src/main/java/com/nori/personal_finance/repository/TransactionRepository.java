@@ -28,4 +28,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
   @Transactional
   void deleteAllByCreditCardId(Long creditCardId);
+
+  List<Transaction> findByAccountIdAndTransactionDateLessThanEqual(Long accountId, LocalDate date);
+
 }

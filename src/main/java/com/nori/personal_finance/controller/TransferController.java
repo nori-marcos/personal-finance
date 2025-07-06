@@ -21,7 +21,7 @@ public class TransferController {
   private final AccountRepository accountRepository;
 
   @GetMapping("/new")
-  public String showNewTransferForm(Model model, Principal principal) {
+  public String showNewTransferForm(final Model model, final Principal principal) {
     model.addAttribute("accounts", accountRepository.findByUserEmail(principal.getName()));
     model.addAttribute("transferRequest", new CreateTransferRequest(null, null, null, null, null));
     model.addAttribute("contentFragment", "user/transfer-form");
@@ -30,7 +30,7 @@ public class TransferController {
 
   @PostMapping
   public String processNewTransfer(
-      @ModelAttribute CreateTransferRequest request, Principal principal) {
+      @ModelAttribute final CreateTransferRequest request, final Principal principal) {
     transferService.createTransfer(request, principal.getName());
     return "redirect:/transactions";
   }
