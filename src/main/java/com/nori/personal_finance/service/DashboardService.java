@@ -26,6 +26,10 @@ public class DashboardService {
   private final CreditCardRespository creditCardRepository;
   private final TransactionRepository transactionRepository;
 
+  public List<Account> findByUserEmail(String userEmail) {
+    return accountRepository.findByUserEmail(userEmail);
+  }
+
   public DashboardView getDashboardData(final String userEmail) {
     // --- Initial Data Fetching ---
     final List<Account> userAccounts = accountRepository.findByUserEmail(userEmail);

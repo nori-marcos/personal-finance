@@ -6,19 +6,17 @@
 
   <div class="box">
     <aside class="menu">
-      <p class="menu-label">
-        Gerenciamento
-      </p>
+      <p class="menu-label">Gerenciamento</p>
       <ul class="menu-list">
+        <li><a th:href="@{/accounts}">Gerenciar Contas</a></li>
         <li><a th:href="@{/categories}">Gerenciar Categorias</a></li>
       </ul>
-      <p class="menu-label">
-        Conta
-      </p>
+
+      <p class="menu-label">Conta</p>
       <ul class="menu-list">
         <li>
-          <form th:action="@{/logout}" method="post" style="display: inline;">
-            <button type="submit" class="button is-danger is-fullwidth">
+          <form th:action="@{/logout}" method="post">
+            <button type="submit" class="button is-fullwidth">
               <span class="icon"><i class="fa-solid fa-right-from-bracket"></i></span>
               <span>Sair (Logout)</span>
             </button>
@@ -28,6 +26,22 @@
     </aside>
   </div>
 
+  <div class="card" style="margin-top: 2rem; border: 1px solid #e53935;">
+    <header class="card-header" style="background-color: #e53935;">
+      <p class="card-header-title" style="color: white;">Zona de Perigo</p>
+    </header>
+    <div class="card-content">
+      <div class="content">
+        <p>
+          Uma vez que você exclui sua conta, não há como voltar atrás. Tenha certeza absoluta.
+        </p>
+        <form th:action="@{/profile/delete}" method="post"
+              onsubmit="return confirm('ATENÇÃO: Você tem certeza ABSOLUTA?\nEsta ação é permanente e irá apagar TODA a sua informação financeira (contas, cartões, transações, etc).');">
+          <button type="submit" class="button is-danger is-fullwidth">Excluir minha conta permanentemente</button>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
 </body>
 </html>

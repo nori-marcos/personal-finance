@@ -59,4 +59,11 @@ public class AccountController {
     accountService.deleteAccount(id, principal.getName());
     return "redirect:/dashboard";
   }
+
+  @GetMapping
+  public String listAccounts(Model model, Principal principal) {
+    model.addAttribute("accounts", accountService.findByUserEmail(principal.getName()));
+    model.addAttribute("contentFragment", "user/account-list");
+    return "layout";
+  }
 }

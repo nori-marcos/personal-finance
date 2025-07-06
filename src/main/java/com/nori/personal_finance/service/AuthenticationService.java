@@ -3,8 +3,13 @@ package com.nori.personal_finance.service;
 import com.nori.personal_finance.dto.CreateUserRequest;
 import com.nori.personal_finance.model.Category;
 import com.nori.personal_finance.model.User;
+import com.nori.personal_finance.repository.AccountRepository;
 import com.nori.personal_finance.repository.CategoryRepository;
+import com.nori.personal_finance.repository.CreditCardRespository;
+import com.nori.personal_finance.repository.TransactionRepository;
+import com.nori.personal_finance.repository.TransferRepository;
 import com.nori.personal_finance.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,6 +21,10 @@ public class AuthenticationService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final CategoryRepository categoryRepository;
+  private final TransactionRepository transactionRepository;
+  private final TransferRepository transferRepository;
+  private final CreditCardRespository creditCardRepository;
+  private final AccountRepository accountRepository;
 
   public String createUser(final CreateUserRequest request) {
     if (userRepository.existsByEmail(request.email())) {
@@ -44,5 +53,25 @@ public class AuthenticationService {
             .toList();
 
     categoryRepository.saveAll(defaultCategories);
+  }
+
+  @Transactional
+  public void deleteUserAndAllData(final String userEmail) {
+    if (!userRepository.existsByEmail(userEmail)) {
+      throw new IllegalStateException("User not found");
+    }
+
+    // Delete in the correct order to respect foreign key constraints
+    // 1. Data that depends on Accounts and Cards
+    transferRepository.deleteAllByUserEmail(userEmail);
+    transactionRepository.deleteAllByUserEmail(userEmail);
+
+    // 2. Data that depends on User
+    creditCardRepository.deleteAllByUserEmail(userEmail);
+    accountRepository.deleteAllByUserEmail(userEmail);
+    categoryRepository.deleteAllByUserEmail(userEmail);
+
+    // 3. Finally, delete the User
+    userRepository.deleteByEmail(userEmail);
   }
 }

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<body>
+<div th:fragment="content">
+  <div class="level">
+    <div class="level-left">
+      <h1 class="title">Gerenciar Contas</h1>
+    </div>
+    <div class="level-right">
+      <a th:href="@{/accounts/new}" class="button is-primary">
+        <span class="icon"><i class="fa-solid fa-plus"></i></span>
+        <span>Nova Conta</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="box">
+    <div th:if="${#lists.isEmpty(accounts)}">
+      <p>Nenhuma conta encontrada.</p>
+    </div>
+    <div th:each="account : ${accounts}" class="media account-item">
+      <div class="media-left">
+               <span class="icon is-medium">
+                   <i th:if="${account.accountType.name() == 'SAVINGS_ACCOUNT'}" class="fa-solid fa-piggy-bank"></i>
+                   <i th:unless="${account.accountType.name() == 'SAVINGS_ACCOUNT'}" class="fa-solid fa-landmark"></i>
+               </span>
+      </div>
+      <div class="media-content">
+        <strong th:text="${account.name}"></strong><br>
+        <small th:text="${account.institution}"></small>
+      </div>
+      <div class="media-right">
+        <div class="buttons">
+          <form th:action="@{/accounts/{id}/delete(id=${account.id})}" method="post" onsubmit="return confirm('Tem certeza que deseja excluir esta conta e TODAS as suas transações? Esta ação não pode ser desfeita.');">
+            <button class="button is-danger is-outlined" type="submit">Excluir</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
