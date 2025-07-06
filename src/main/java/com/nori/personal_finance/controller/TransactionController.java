@@ -108,7 +108,7 @@ public class TransactionController {
   public String getNewCreditCardExpenseForm(final Model model, final Principal principal) {
     model.addAttribute("expenseRequest", new CreateCreditCardExpenseRequest(null, null, null, null, null, null));
     model.addAttribute("creditCards", creditCardRepository.findByUserEmail(principal.getName()));
-    model.addAttribute("categories", categoryRepository.findByUserEmail(principal.getName()));
+    model.addAttribute("categories", categoryRepository.findByUserEmailExcludingTransferencia(principal.getName()));
     return "user/credit-card-expense-form :: content";
   }
 }

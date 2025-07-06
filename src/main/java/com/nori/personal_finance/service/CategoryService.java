@@ -22,7 +22,7 @@ public class CategoryService {
   private final TransactionRepository transactionRepository;
 
   public List<Category> findByUserEmail(final String userEmail) {
-    return categoryRepository.findByUserEmail(userEmail);
+    return categoryRepository.findByUserEmailExcludingTransferencia(userEmail);
   }
 
   public Category findByIdAndUser(final Long id, final String userEmail) {
@@ -37,6 +37,14 @@ public class CategoryService {
   public void createCategory(final CategoryRequest request, final String userEmail) {
     final User user = userRepository.findByEmail(userEmail)
                     .orElseThrow(() -> new IllegalStateException("User not found"));
+
+    if (request.name().equals("Transferência")) {
+      throw new IllegalArgumentException("Cannot create a category with the name 'Transferência'");
+    }
+
+    if (categoryRepository.existsByNameAndUserEmail(request.name(), userEmail)) {
+      throw new IllegalArgumentException("Category with this name already exists for the user");
+    }
 
     final Category category = new Category();
     category.setName(request.name());

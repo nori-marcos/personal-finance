@@ -56,7 +56,7 @@ public class TransactionService {
 
   public TransactionFormView getTransactionFormData(final String userEmail) {
     final List<Account> accounts = accountRepository.findByUserEmail(userEmail);
-    final List<Category> categories = categoryRepository.findByUserEmail(userEmail);
+    final List<Category> categories = categoryRepository.findByUserEmailExcludingTransferencia(userEmail);
     return new TransactionFormView(accounts, categories);
   }
 
@@ -71,7 +71,7 @@ public class TransactionService {
 
   public CreditCardExpenseFormView getCreditCardExpenseFormData(final String userEmail) {
     final List<CreditCard> creditCards = creditCardRepository.findByUserEmail(userEmail);
-    final List<Category> categories = categoryRepository.findByUserEmail(userEmail);
+    final List<Category> categories = categoryRepository.findByUserEmailExcludingTransferencia(userEmail);
     return new CreditCardExpenseFormView(creditCards, categories);
   }
 
