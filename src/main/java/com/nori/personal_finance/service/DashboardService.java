@@ -27,6 +27,7 @@ public class DashboardService {
   private final TransactionRepository transactionRepository;
 
   public DashboardView getDashboardData(final String userEmail) {
+    // --- Initial Data Fetching ---
     final List<Account> userAccounts = accountRepository.findByUserEmail(userEmail);
     final List<CreditCard> userCreditCards = creditCardRepository.findByUserEmail(userEmail);
 
@@ -35,15 +36,25 @@ public class DashboardService {
     final List<CreditCardView> creditCardViews =
         userCreditCards.stream().map(this::mapToCreditCardView).collect(Collectors.toList());
 
-    final BigDecimal totalAccountBalance =
+    // --- METRIC 1: Saldo Geral (Total in Accounts) ---
+    final BigDecimal saldoGeral =
         accountViews.stream().map(AccountView::balance).reduce(BigDecimal.ZERO, BigDecimal::add);
-    final BigDecimal totalOpenInvoice =
-        creditCardViews.stream()
-            .map(CreditCardView::currentInvoice)
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+    // --- METRIC 2: Dívida Geral (Total Debt) ---
+    final BigDecimal dividaGeral = calculateTotalDebt(userEmail, userCreditCards);
+
+    // --- METRIC 3: Dívida do Mês (Monthly Debt) ---
+    final BigDecimal dividaDoMes = calculateMonthlyDebt(userEmail, userCreditCards);
+
+    // --- Other view data ---
     final List<UpcomingBillView> upcomingBills = getUpcomingBills(userCreditCards);
 
+    return new DashboardView(
+        saldoGeral, dividaDoMes, dividaGeral, accountViews, creditCardViews, upcomingBills);
+  }
+
+  private BigDecimal calculateTotalDebt(
+      final String userEmail, final List<CreditCard> userCreditCards) {
     final YearMonth currentMonth = YearMonth.now();
     final List<Transaction> accountExpenses =
         transactionRepository.findByUserEmailAndAccountIsNotNullAndTypeAndTransactionDateBetween(
@@ -69,17 +80,35 @@ public class DashboardService {
         totalCreditCardDebt = totalCreditCardDebt.add(cardNetBalance);
       }
     }
-    final BigDecimal totalDebt = monthlyAccountExpenses.add(totalCreditCardDebt);
+    return monthlyAccountExpenses.add(totalCreditCardDebt);
+  }
 
-    final BigDecimal overallNetBalance = totalAccountBalance.subtract(totalDebt);
+  private BigDecimal calculateMonthlyDebt(
+      final String userEmail, final List<CreditCard> userCreditCards) {
+    final YearMonth currentMonth = YearMonth.now();
+    // Get account expenses for the current month
+    final List<Transaction> accountExpenses =
+        transactionRepository.findByUserEmailAndAccountIsNotNullAndTypeAndTransactionDateBetween(
+            userEmail, TransactionType.EXPENSE, currentMonth.atDay(1), currentMonth.atEndOfMonth());
+    final BigDecimal monthlyAccountExpenses =
+        accountExpenses.stream()
+            .map(Transaction::getAmount)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-    return new DashboardView(
-        overallNetBalance,
-        accountViews,
-        totalOpenInvoice,
-        creditCardViews,
-        upcomingBills,
-        totalDebt);
+    // Get credit card invoices due this month
+    BigDecimal monthlyCardInvoices = BigDecimal.ZERO;
+    for (final CreditCard card : userCreditCards) {
+      final LocalDate today = LocalDate.now();
+      final LocalDate dueDate =
+          today.getDayOfMonth() <= card.getClosingDay()
+              ? today.withDayOfMonth(card.getDueDay())
+              : today.plusMonths(1).withDayOfMonth(card.getDueDay());
+
+      if (YearMonth.from(dueDate).equals(currentMonth)) {
+        monthlyCardInvoices = monthlyCardInvoices.add(calculateCurrentInvoice(card));
+      }
+    }
+    return monthlyAccountExpenses.add(monthlyCardInvoices);
   }
 
   private List<UpcomingBillView> getUpcomingBills(final List<CreditCard> userCreditCards) {

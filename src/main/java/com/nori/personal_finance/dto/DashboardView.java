@@ -4,9 +4,12 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public record DashboardView(
-    BigDecimal totalBalance,
+    // New, clearer metric names
+    BigDecimal saldoGeral,
+    BigDecimal dividaDoMes,
+    BigDecimal dividaGeral,
+
+    // Existing lists for the cards below
     List<AccountView> accounts,
-    BigDecimal totalInvoice,
     List<CreditCardView> creditCards,
-    List<UpcomingBillView> upcomingBills,
-    BigDecimal totalDebt) {} // Add totalDebt
+    List<UpcomingBillView> upcomingBills) {}
