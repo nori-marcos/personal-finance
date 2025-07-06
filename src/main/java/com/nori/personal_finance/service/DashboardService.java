@@ -60,7 +60,6 @@ public class DashboardService {
   private CreditCardView mapToCreditCardView(final CreditCard card) {
     final BigDecimal currentInvoice = calculateCurrentInvoice(card);
     final BigDecimal availableLimit = card.getLimitAmount().subtract(currentInvoice);
-    // Pass the card's ID as the first argument
     return new CreditCardView(card.getId(), card.getName(), availableLimit, currentInvoice);
   }
 

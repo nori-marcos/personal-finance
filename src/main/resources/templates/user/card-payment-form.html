@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<body>
+<div th:fragment="content" id="mobile-card-payment-form-page">
+    <h1 class="title">Pagamento de Fatura</h1>
+    <form th:action="@{/card-payments}" th:object="${paymentRequest}" method="post">
+        <div class="field">
+            <label class="label">Pagar de qual conta?</label>
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select name="fromAccountId" required>
+                        <option value="">Selecione a conta de origem</option>
+                        <option th:each="acc : ${accounts}" th:value="${acc.id}" th:text="${acc.name}"></option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Pagar qual cartão?</label>
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select name="creditCardId" required>
+                        <option value="">Selecione o cartão de crédito</option>
+                        <option th:each="card : ${creditCards}" th:value="${card.id}" th:text="${card.name}"></option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Valor do Pagamento</label>
+            <div class="control">
+                <input class="input" type="number" step="0.01" placeholder="R$ 0,00" name="amount" required>
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Data do Pagamento</label>
+            <div class="control">
+                <input class="input" type="date" name="date" required>
+            </div>
+        </div>
+
+        <div class="field is-grouped" style="margin-top: 2rem;">
+            <div class="control">
+                <button type="submit" class="button is-primary">Realizar Pagamento</button>
+            </div>
+            <div class="control">
+                <a th:href="@{/dashboard}" class="button is-light">Cancelar</a>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

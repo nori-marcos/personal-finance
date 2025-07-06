@@ -1,5 +1,7 @@
 package com.nori.personal_finance.controller;
 
+import com.nori.personal_finance.dto.CreateCreditCardExpenseRequest;
+import com.nori.personal_finance.dto.CreditCardExpenseFormView;
 import com.nori.personal_finance.dto.MonthlyTransactionsView;
 import com.nori.personal_finance.dto.TransactionFormView;
 import com.nori.personal_finance.model.Transaction;
@@ -67,6 +69,26 @@ public class TransactionController {
   public String processNewTransaction(
       @ModelAttribute final Transaction transaction, final Principal principal) {
     transactionService.createTransaction(transaction, principal.getName());
+    return "redirect:/transactions";
+  }
+
+  @GetMapping("/new/credit-card")
+  public String showNewCreditCardExpenseForm(Model model, Principal principal) {
+    CreditCardExpenseFormView formData =
+        transactionService.getCreditCardExpenseFormData(principal.getName());
+    model.addAttribute(
+        "expenseRequest", new CreateCreditCardExpenseRequest(null, null, null, null, null));
+    model.addAttribute("creditCards", formData.creditCards());
+    model.addAttribute("categories", formData.categories());
+    model.addAttribute("contentFragment", "user/credit-card-expense-form");
+    return "layout";
+  }
+
+  // NEW: Process the credit card expense form
+  @PostMapping("/credit-card")
+  public String processNewCreditCardExpense(
+      @ModelAttribute CreateCreditCardExpenseRequest request, Principal principal) {
+    transactionService.createCreditCardExpense(request, principal.getName());
     return "redirect:/transactions";
   }
 }

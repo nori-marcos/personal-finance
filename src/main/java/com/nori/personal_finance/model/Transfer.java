@@ -9,7 +9,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import lombok.Data;
 
+@Data
 @Entity
 @Table(name = "transfers")
 public class Transfer {

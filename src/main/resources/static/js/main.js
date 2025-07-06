@@ -74,6 +74,14 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = '/dashboard';
 
         }
+        if (document.getElementById('mobile-cc-expense-form-page') && isDesktop) {
+            window.location.href = '/transactions';
+            return;
+        }
+        if (document.getElementById('mobile-card-payment-form-page') && isDesktop) {
+            window.location.href = '/dashboard';
+            return;
+        }
     };
 
     handleResponsiveRedirect();
