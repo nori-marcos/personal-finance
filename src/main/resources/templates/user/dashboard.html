@@ -3,7 +3,7 @@
 <body>
 <div th:fragment="content">
 
-    <div class="columns is-mobile">
+    <div class="columns">
         <div class="column">
             <div class="notification has-text-centered"
                  th:classappend="${dashboardData.totalBalance.doubleValue() < 0 ? 'is-danger' : 'is-success'}">
