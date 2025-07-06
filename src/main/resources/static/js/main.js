@@ -13,81 +13,44 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- MODAL & AJAX FORM FOR DESKTOP ---
-    const addTransactionButton = document.getElementById('add-transaction-button');
-    const modal = document.getElementById('add-transaction-modal');
-    const modalFormContent = document.getElementById('modal-form-content');
-    const modalCloseButton = document.getElementById('modal-close-button');
+    // --- REUSABLE MODAL HANDLER ---
+    const setupModal = (buttonId, modalId, formContentId, formUrl) => {
+        const triggerButton = document.getElementById(buttonId);
+        const modal = document.getElementById(modalId);
+        const formContent = document.getElementById(formContentId);
 
-    // Function to open the modal
-    const openModal = () => {
-        fetch('/transactions/new-form')
-            .then(response => response.text())
-            .then(html => {
-                modalFormContent.innerHTML = html;
-                modal.classList.add('is-active');
-                attachFormSubmitListener();
-            });
+        if (!triggerButton || !modal || !formContent) return;
+
+        const openModal = () => {
+            fetch(formUrl)
+                .then(response => response.ok ? response.text() : Promise.reject('Failed to load form'))
+                .then(html => {
+                    formContent.innerHTML = html;
+                    modal.classList.add('is-active');
+                }).catch(error => console.error("Error loading modal content:", error));
+        };
+
+        const closeModal = () => modal.classList.remove('is-active');
+
+        triggerButton.addEventListener('click', openModal);
+        modal.querySelector('.modal-background').addEventListener('click', closeModal);
+        modal.querySelector('.delete').addEventListener('click', closeModal);
+        document.addEventListener('click', event => {
+            if (event.target && event.target.matches(`#${modalId} #modal-cancel-button`)) {
+                closeModal();
+            }
+        });
     };
 
-    // Function to close the modal
-    const closeModal = () => {
-        modal.classList.remove('is-active');
-        modalFormContent.innerHTML = '';
-    };
+    // --- INITIALIZE ALL MODALS ---
+    setupModal('add-transaction-button', 'add-transaction-modal', 'modal-form-content', '/transactions/new-form');
+    setupModal('add-account-button', 'add-account-modal', 'modal-account-form-content', '/accounts/new-form');
+    setupModal('add-card-button', 'add-card-modal', 'modal-card-form-content', '/cards/new-form');
 
-    // Attach listener to the main "Add Transaction" button on desktop
-    if (addTransactionButton) {
-        addTransactionButton.addEventListener('click', openModal);
-    }
-
-    // Listeners for closing the modal
-    if (modalCloseButton) {
-        modalCloseButton.addEventListener('click', closeModal);
-    }
-
-    // Use event delegation for the dynamically loaded cancel button
-    document.addEventListener('click', function (event) {
-        if (event.target && event.target.id === 'modal-cancel-button') {
-            closeModal();
-        }
-    });
-
-    // Function to handle the AJAX form submission
-    const attachFormSubmitListener = () => {
-        const transactionForm = document.getElementById('transaction-form');
-        if (transactionForm) {
-            transactionForm.addEventListener('submit', function (event) {
-                event.preventDefault();
-
-                const formData = new FormData(transactionForm);
-                const action = event.submitter.value;
-
-                fetch('/api/transactions', {
-                    method: 'POST',
-                    body: formData
-                })
-                    .then(response => {
-                        if (response.ok) {
-                            if (action === 'save') {
-                                window.location.reload();
-                            } else {
-                                transactionForm.reset();
-                                document.getElementById('form-transaction-type').focus();
-                            }
-                        } else {
-                            console.error('Form submission failed');
-                        }
-                    });
-            });
-        }
-    };
 
     // --- MOBILE FLOATING ACTION BUTTON (FAB) ---
-    // This was the missing part
     const fabToggle = document.getElementById('fab-toggle');
     const fabActions = document.querySelector('.fab-action-buttons');
-
     if (fabToggle && fabActions) {
         fabToggle.addEventListener('click', () => {
             fabToggle.classList.toggle('is-active');
@@ -95,20 +58,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- RESPONSIVE REDIRECT LOGIC ---
     const handleResponsiveRedirect = () => {
-        const mobileFormPage = document.getElementById('mobile-new-transaction-page');
-        const isDesktop = window.innerWidth > 1023; // Bulma's breakpoint for desktop
+        const isDesktop = window.innerWidth > 1023;
 
-        if (mobileFormPage && isDesktop) {
-            // If we are on the mobile form page but the screen is now desktop-sized,
-            // redirect to the main transactions page so the user can use the modal.
+        if (document.getElementById('mobile-new-transaction-page') && isDesktop) {
             window.location.href = '/transactions';
+            return;
+        }
+        if (document.getElementById('mobile-account-form-page') && isDesktop) {
+            window.location.href = '/dashboard';
+            return;
+        }
+        if (document.getElementById('mobile-card-form-page') && isDesktop) {
+            window.location.href = '/dashboard';
+            return;
         }
     };
 
-    // Run the check when the page first loads
     handleResponsiveRedirect();
-
-    // Also run the check whenever the window is resized
     window.addEventListener('resize', handleResponsiveRedirect);
 });
