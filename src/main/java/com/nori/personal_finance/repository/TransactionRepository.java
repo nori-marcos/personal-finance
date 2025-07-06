@@ -41,4 +41,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
   @Transactional
   void deleteAllByUserEmail(String userEmail);
+
+  List<Transaction> findByUserEmailAndDescriptionStartingWith(String userEmail, String descriptionPrefix);
+
 }

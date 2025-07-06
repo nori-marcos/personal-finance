@@ -112,6 +112,7 @@ public class TransactionService {
     else {
       final BigDecimal installmentAmount = request.totalOrInstallmentAmount();
 
+      final List<Transaction> transactions = new ArrayList<>();
       for (int i = 0; i < installments; i++) {
         final Transaction transaction = new Transaction();
         transaction.setAmount(installmentAmount);
@@ -126,8 +127,9 @@ public class TransactionService {
         transaction.setCategory(category);
         transaction.setUser(user);
 
-        transactionRepository.save(transaction);
+        transactions.add(transaction);
       }
+      transactionRepository.saveAll(transactions);
     }
   }
 
@@ -200,24 +202,14 @@ public class TransactionService {
     } else if (matcher.matches()) {
       // It's an installment plan. Delete all related transactions.
       final String baseDescription = matcher.group(1); // Get the part before " (x/y)"
-
-      final List<Transaction> allUserTransactions =
-          transactionRepository.findByUserEmail(userEmail);
-      final List<Transaction> transactionsToDelete = new ArrayList<>();
-
-      for (final Transaction t : allUserTransactions) {
-        // Find all transactions that start with the same base description
-        // and have an installment pattern.
-        if (t.getDescription() != null
-            && t.getDescription().startsWith(baseDescription)
-            && pattern.matcher(t.getDescription()).matches()) {
-          transactionsToDelete.add(t);
-        }
-      }
+      final List<Transaction> transactionsToDelete =
+          transactionRepository
+              .findByUserEmailAndDescriptionStartingWith(userEmail, baseDescription)
+              .stream()
+              .filter(t -> pattern.matcher(t.getDescription()).matches())
+              .toList();
       transactionRepository.deleteAll(transactionsToDelete);
     } else {
-      // It's a regular transaction or an installment.
-      // (The installment logic you had before can be merged here if needed)
       transactionRepository.delete(transactionToDelete);
     }
   }
