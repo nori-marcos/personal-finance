@@ -40,19 +40,28 @@
     <div class="box" th:each="transaction : ${transactions}">
         <article class="media">
             <div class="media-content">
-                <div class="content">
-                    <p>
-                        <strong th:text="${transaction.description}">Descrição da Transação</strong>
-                        <br>
-                        <small th:text="${#temporals.format(transaction.transactionDate, 'dd/MM/yyyy')}"></small>
-                    </p>
-                </div>
+                <p>
+                    <strong th:text="${transaction.description}"></strong><br>
+                    <small th:text="${#temporals.format(transaction.transactionDate, 'dd/MM/yyyy')}"></small>
+                </p>
             </div>
             <div class="media-right">
-                <span th:if="${transaction.type.name() == 'INCOME'}" class="has-text-success"
-                      th:text="'+ R$ ' + ${#numbers.formatDecimal(transaction.amount, 1, 'POINT', 2, 'COMMA')}"></span>
-                <span th:if="${transaction.type.name() == 'EXPENSE'}" class="has-text-danger"
-                      th:text="'- R$ ' + ${#numbers.formatDecimal(transaction.amount, 1, 'POINT', 2, 'COMMA')}"></span>
+                <div class="level is-mobile">
+                    <div class="level-item">
+                        <span th:if="${transaction.type.name() == 'INCOME'}" class="has-text-success"
+                              th:text="'+ R$ ' + ${#numbers.formatDecimal(transaction.amount, 1, 'POINT', 2, 'COMMA')}"></span>
+                        <span th:if="${transaction.type.name() == 'EXPENSE'}" class="has-text-danger"
+                              th:text="'- R$ ' + ${#numbers.formatDecimal(transaction.amount, 1, 'POINT', 2, 'COMMA')}"></span>
+                    </div>
+                    <div class="level-item">
+                        <form th:action="@{/transactions/{id}/delete(id=${transaction.id})}" method="post"
+                              onsubmit="return confirm('Tem certeza que deseja excluir este lançamento? Se for uma parcela, todo o parcelamento será excluído.');">
+                            <button class="button is-danger is-small is-outlined" type="submit">
+                                <span class="icon is-small"><i class="fa-solid fa-trash-can"></i></span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </article>
     </div>

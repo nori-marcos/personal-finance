@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<body>
+<div th:fragment="content">
+    <div class="level">
+        <div class="level-left">
+            <h1 class="title">Gerenciar Categorias</h1>
+        </div>
+        <div class="level-right">
+            <a th:href="@{/categories/new}" class="button is-primary">
+                <span class="icon"><i class="fa-solid fa-plus"></i></span>
+                <span>Nova Categoria</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="box">
+        <div th:each="category : ${categories}" class="media account-item">
+            <div class="media-left">
+                <span class="icon is-medium">
+                    <i class="fa-solid fa-tag" th:style="'color:' + ${category.color}"></i>
+                </span>
+            </div>
+            <div class="media-content">
+                <strong th:text="${category.name}"></strong>
+            </div>
+            <div class="media-right">
+                <div class="buttons">
+                    <a th:href="@{/categories/{id}/edit(id=${category.id})}" class="button is-light">Editar</a>
+                    <form th:action="@{/categories/{id}/delete(id=${category.id})}" method="post" onsubmit="return confirm('Tem certeza?');">
+                        <button class="button is-danger is-outlined" type="submit">Excluir</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div th:if="${#lists.isEmpty(categories)}">
+            <p>Nenhuma categoria encontrada. As categorias padrão serão criadas para novos usuários.</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

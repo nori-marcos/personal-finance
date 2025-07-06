@@ -29,33 +29,52 @@
             <div>
                 <p class="heading">Disponível</p>
                 <p class="title is-5"
-                   th:classappend="${viewData.availableLimit.doubleValue() < 0 ? 'has-text-danger' : ''}"
-                   th:text="'R$ ' + ${#numbers.formatDecimal(viewData.availableLimit, 1, 'POINT', 2, 'COMMA')}"></p>
+                   th:classappend="${viewData.balanceInfo.availableLimit.doubleValue() < 0 ? 'has-text-danger' : ''}"
+                   th:text="'R$ ' + ${#numbers.formatDecimal(viewData.balanceInfo.availableLimit, 1, 'POINT', 2, 'COMMA')}"></p>
             </div>
         </div>
-        <div class="level-item has-text-centered">
+        <div class="level-item has-text-centered" th:if="${viewData.balanceInfo.invoice.doubleValue() > 0}">
             <div>
                 <p class="heading">Fatura Atual</p>
                 <p class="title is-5 has-text-danger"
-                   th:text="'-R$ ' + ${#numbers.formatDecimal(viewData.currentInvoice, 1, 'POINT', 2, 'COMMA')}"></p>
+                   th:text="'-R$ ' + ${#numbers.formatDecimal(viewData.balanceInfo.invoice, 1, 'POINT', 2, 'COMMA')}"></p>
+            </div>
+        </div>
+        <div class="level-item has-text-centered" th:if="${viewData.balanceInfo.creditBalance.doubleValue() > 0}">
+            <div>
+                <p class="heading">Saldo Credor</p>
+                <p class="title is-5 has-text-success"
+                   th:text="'R$ ' + ${#numbers.formatDecimal(viewData.balanceInfo.creditBalance, 1, 'POINT', 2, 'COMMA')}"></p>
             </div>
         </div>
     </div>
 
     <hr>
-    <h3 class="title is-4">Transações do Cartão</h3>
+    <h3 class="title is-4">Transações do Cartão na Fatura Atual</h3>
 
     <div th:if="${#lists.isEmpty(viewData.transactions)}" class="box">
         <p>Nenhuma transação encontrada para este cartão.</p>
     </div>
-    <div class="box" th:each="transaction : ${viewData.transactions}">
-        <article class="media">
-            <div class="media-content"><p><strong th:text="${transaction.description}"></strong><br><small
-                    th:text="${#temporals.format(transaction.transactionDate, 'dd/MM/yyyy')}"></small></p></div>
-            <div class="media-right"><span class="has-text-danger"
-                                           th:text="'-R$ ' + ${#numbers.formatDecimal(transaction.amount, 1, 'POINT', 2, 'COMMA')}"></span>
+    <div class="box" th:unless="${#lists.isEmpty(viewData.transactions)}">
+        <div th:each="transaction : ${viewData.transactions}" class="level is-mobile account-item">
+            <div class="level-left">
+                <div class="level-item">
+                    <div>
+                        <p class="is-size-6"><strong th:text="${transaction.description}"></strong></p>
+                        <p class="is-size-7 has-text-grey"
+                           th:text="${#temporals.format(transaction.transactionDate, 'dd/MM/yyyy')}"></p>
+                    </div>
+                </div>
             </div>
-        </article>
+            <div class="level-right">
+                <div class="level-item">
+                    <span th:if="${transaction.type.name() == 'EXPENSE'}" class="has-text-danger"
+                          th:text="'-R$ ' + ${#numbers.formatDecimal(transaction.amount, 1, 'POINT', 2, 'COMMA')}"></span>
+                    <span th:if="${transaction.type.name() == 'INCOME'}" class="has-text-success"
+                          th:text="'+R$ ' + ${#numbers.formatDecimal(transaction.amount, 1, 'POINT', 2, 'COMMA')}"></span>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 </body>

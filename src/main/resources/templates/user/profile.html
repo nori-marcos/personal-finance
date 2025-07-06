@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<body>
+<div th:fragment="content">
+  <h1 class="title">Perfil e Configurações</h1>
+
+  <div class="box">
+    <aside class="menu">
+      <p class="menu-label">
+        Gerenciamento
+      </p>
+      <ul class="menu-list">
+        <li><a th:href="@{/categories}">Gerenciar Categorias</a></li>
+      </ul>
+      <p class="menu-label">
+        Conta
+      </p>
+      <ul class="menu-list">
+        <li>
+          <form th:action="@{/logout}" method="post" style="display: inline;">
+            <button type="submit" class="button is-danger is-fullwidth">
+              <span class="icon"><i class="fa-solid fa-right-from-bracket"></i></span>
+              <span>Sair (Logout)</span>
+            </button>
+          </form>
+        </li>
+      </ul>
+    </aside>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<body>
+<div th:fragment="content">
+    <h1 class="title" th:text="${category != null ? 'Editar Categoria' : 'Nova Categoria'}"></h1>
+    <form th:action="${category != null ? '/categories/' + category.id + '/edit' : '/categories/new'}"
+          th:object="${categoryRequest}" method="post">
+        <div class="field">
+            <label class="label">Nome</label>
+            <div class="control">
+                <input class="input" type="text" th:field="*{name}" required>
+            </div>
+        </div>
+        <div class="field">
+            <label class="label">Cor</label>
+            <div class="control">
+                <input class="input" type="color" th:field="*{color}" style="height: 40px;">
+            </div>
+        </div>
+        <div class="field is-grouped" style="margin-top: 2rem;">
+            <div class="control"><button type="submit" class="button is-primary">Salvar</button></div>
+            <div class="control"><a th:href="@{/categories}" class="button is-light">Cancelar</a></div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

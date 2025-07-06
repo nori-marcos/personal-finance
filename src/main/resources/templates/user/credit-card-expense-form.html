@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<body>
+<div th:fragment="content" id="mobile-cc-expense-form-page">
+    <h1 class="title">Nova Despesa no Cartão</h1>
+    <form th:action="@{/transactions/credit-card}" th:object="${expenseRequest}" method="post">
+        <div class="field">
+            <label class="label">Valor da Compra ou da Parcela</label>
+            <div class="control"><input class="input" type="number" step="0.01" name="amount" required></div>
+        </div>
+        <div class="field">
+            <label class="label">Descrição</label>
+            <div class="control"><input class="input" type="text" name="description" required></div>
+        </div>
+        <div class="field">
+            <label class="label">Data da Compra</label>
+            <div class="control"><input class="input" type="date" name="transactionDate" required></div>
+        </div>
+
+        <div class="field">
+            <label class="label">Número de Parcelas (Opcional)</label>
+            <div class="control">
+                <input class="input" type="number" min="1" placeholder="Deixe em branco para pagamento único"
+                       name="numberOfInstallments">
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Cartão de Crédito</label>
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select name="creditCardId" required>
+                        <option value="">Selecione um cartão</option>
+                        <option th:each="card : ${creditCards}" th:value="${card.id}" th:text="${card.name}"></option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Categoria</label>
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select name="categoryId" required>
+                        <option value="">Selecione uma categoria</option>
+                        <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="field is-grouped" style="margin-top: 2rem;">
+            <div class="control">
+                <button type="submit" class="button is-primary">Salvar Despesa</button>
+            </div>
+            <div class="control"><a th:href="@{/dashboard}" class="button is-light">Cancelar</a></div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

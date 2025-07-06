@@ -1,6 +1,7 @@
 package com.nori.personal_finance.repository;
 
 import com.nori.personal_finance.model.Transaction;
+import com.nori.personal_finance.model.TransactionType;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
@@ -31,4 +32,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
   List<Transaction> findByAccountIdAndTransactionDateLessThanEqual(Long accountId, LocalDate date);
 
+  List<Transaction> findByCategoryId(Long categoryId);
+
+  List<Transaction> findByUserEmailAndAccountIsNotNullAndTypeAndTransactionDateBetween(
+      String userEmail, TransactionType type, LocalDate startDate, LocalDate endDate);
 }

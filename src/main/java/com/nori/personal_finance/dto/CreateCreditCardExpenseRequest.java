@@ -8,4 +8,5 @@ public record CreateCreditCardExpenseRequest(
     String description,
     LocalDate transactionDate,
     Long categoryId,
-    Long creditCardId) {}
+    Long creditCardId,
+    Integer numberOfInstallments) {}

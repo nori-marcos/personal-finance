@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -77,7 +78,7 @@ public class TransactionController {
     final CreditCardExpenseFormView formData =
         transactionService.getCreditCardExpenseFormData(principal.getName());
     model.addAttribute(
-        "expenseRequest", new CreateCreditCardExpenseRequest(null, null, null, null, null));
+        "expenseRequest", new CreateCreditCardExpenseRequest(null, null, null, null, null, null));
     model.addAttribute("creditCards", formData.creditCards());
     model.addAttribute("categories", formData.categories());
     model.addAttribute("contentFragment", "user/credit-card-expense-form");
@@ -89,6 +90,13 @@ public class TransactionController {
   public String processNewCreditCardExpense(
       @ModelAttribute final CreateCreditCardExpenseRequest request, final Principal principal) {
     transactionService.createCreditCardExpense(request, principal.getName());
+    return "redirect:/transactions";
+  }
+
+  @PostMapping("/{id}/delete")
+  public String deleteTransaction(@PathVariable("id") final Long id, final Principal principal) {
+    transactionService.deleteTransaction(id, principal.getName());
+    // Redirect back to the main transactions list
     return "redirect:/transactions";
   }
 }

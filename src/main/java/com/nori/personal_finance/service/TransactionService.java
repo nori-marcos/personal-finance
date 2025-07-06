@@ -17,11 +17,17 @@ import com.nori.personal_finance.repository.CreditCardRespository;
 import com.nori.personal_finance.repository.TransactionRepository;
 import com.nori.personal_finance.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -89,16 +95,54 @@ public class TransactionService {
             .findById(request.categoryId())
             .orElseThrow(() -> new IllegalArgumentException("Category not found"));
 
-    final Transaction transaction = new Transaction();
-    transaction.setDescription(request.description());
-    transaction.setAmount(request.amount());
-    transaction.setTransactionDate(request.transactionDate());
-    transaction.setType(TransactionType.EXPENSE);
-    transaction.setCreditCard(card); // Link to the credit card
-    transaction.setCategory(category);
-    transaction.setUser(user);
+    final Integer installments = request.numberOfInstallments();
 
-    transactionRepository.save(transaction);
+    // Case 1: Single payment (not an installment plan)
+    if (installments == null || installments <= 1) {
+      final Transaction transaction = new Transaction();
+      transaction.setDescription(request.description());
+      transaction.setAmount(request.amount());
+      transaction.setTransactionDate(request.transactionDate());
+      transaction.setType(TransactionType.EXPENSE);
+      transaction.setCreditCard(card);
+      transaction.setCategory(category);
+      transaction.setUser(user);
+      transactionRepository.save(transaction);
+    }
+    // Case 2: Installment plan
+    else {
+      final BigDecimal totalAmount = request.amount();
+      // Calculate the value of each installment, rounded to 2 decimal places
+      final BigDecimal installmentAmount =
+          totalAmount.divide(new BigDecimal(installments), 2, RoundingMode.HALF_UP);
+
+      BigDecimal sumOfInstallments = BigDecimal.ZERO;
+
+      for (int i = 0; i < installments; i++) {
+        final Transaction transaction = new Transaction();
+
+        // For the last installment, adjust the amount to prevent rounding errors
+        if (i == installments - 1) {
+          transaction.setAmount(totalAmount.subtract(sumOfInstallments));
+        } else {
+          transaction.setAmount(installmentAmount);
+          sumOfInstallments = sumOfInstallments.add(installmentAmount);
+        }
+
+        // Set the description to include the installment number, e.g., "Phone (1/12)"
+        transaction.setDescription(
+            String.format("%s (%d/%d)", request.description(), i + 1, installments));
+        // Set the date for each transaction in the upcoming months
+        transaction.setTransactionDate(request.transactionDate().plusMonths(i));
+
+        transaction.setType(TransactionType.EXPENSE);
+        transaction.setCreditCard(card);
+        transaction.setCategory(category);
+        transaction.setUser(user);
+
+        transactionRepository.save(transaction);
+      }
+    }
   }
 
   @Transactional
@@ -137,5 +181,45 @@ public class TransactionService {
     payment.setCreditCard(card); // Link this transaction to the card
     payment.setUser(user);
     transactionRepository.save(payment);
+  }
+
+  @Transactional
+  public void deleteTransaction(final Long transactionId, final String userEmail) {
+    // 1. Find the transaction and verify ownership
+    final Transaction transactionToDelete =
+        transactionRepository
+            .findById(transactionId)
+            .orElseThrow(() -> new IllegalArgumentException("Transaction not found"));
+
+    if (!transactionToDelete.getUser().getEmail().equals(userEmail)) {
+      throw new AccessDeniedException("User does not have permission to delete this transaction");
+    }
+
+    // 2. Check if it's an installment transaction
+    final String description = transactionToDelete.getDescription();
+    final Pattern pattern = Pattern.compile("^(.*) \\(\\d+/\\d+\\)$"); // Regex to find " (x/y)"
+    final Matcher matcher = pattern.matcher(description);
+
+    if (matcher.matches()) {
+      // It's an installment plan. Delete all related transactions.
+      final String baseDescription = matcher.group(1); // Get the part before " (x/y)"
+
+      final List<Transaction> allUserTransactions = transactionRepository.findByUserEmail(userEmail);
+      final List<Transaction> transactionsToDelete = new ArrayList<>();
+
+      for (final Transaction t : allUserTransactions) {
+        // Find all transactions that start with the same base description
+        // and have an installment pattern.
+        if (t.getDescription() != null
+            && t.getDescription().startsWith(baseDescription)
+            && pattern.matcher(t.getDescription()).matches()) {
+          transactionsToDelete.add(t);
+        }
+      }
+      transactionRepository.deleteAll(transactionsToDelete);
+    } else {
+      // It's a single transaction. Just delete it.
+      transactionRepository.deleteById(transactionId);
+    }
   }
 }

@@ -3,10 +3,20 @@
 <body>
 <div th:fragment="content">
 
-    <div class="box has-background-light has-text-centered">
-        <p class="heading">Saldo geral</p>
-        <h1 class="title is-2" th:classappend="${dashboardData.totalBalance.doubleValue() < 0 ? 'has-text-danger' : ''}"
-            th:text="'R$ ' + ${#numbers.formatDecimal(dashboardData.totalBalance, 1, 'POINT', 2, 'COMMA')}"></h1>
+    <div class="columns is-mobile">
+        <div class="column">
+            <div class="notification has-text-centered"
+                 th:classappend="${dashboardData.totalBalance.doubleValue() < 0 ? 'is-danger' : 'is-success'}">
+                <p class="heading">Saldo Geral</p>
+                <p class="title" th:text="'R$ ' + ${#numbers.formatDecimal(dashboardData.totalBalance, 1, 'POINT', 2, 'COMMA')}"></p>
+            </div>
+        </div>
+        <div class="column">
+            <div class="notification is-danger has-text-centered">
+                <p class="heading">Sua Dívida Total</p>
+                <p class="title" th:text="'-R$ ' + ${#numbers.formatDecimal(dashboardData.totalDebt, 1, 'POINT', 2, 'COMMA')}"></p>
+            </div>
+        </div>
     </div>
 
     <div class="card" style="margin-top: 2rem;" th:if="${!#lists.isEmpty(dashboardData.upcomingBills)}">
@@ -31,17 +41,15 @@
             </div>
         </div>
     </div>
+
     <div class="card" style="margin-top: 2rem;">
-        <header class="card-header">
-            <p class="card-header-title">Minhas Contas</p>
-        </header>
+        <header class="card-header"><p class="card-header-title">Minhas Contas</p></header>
         <div class="card-content">
             <div th:if="${#lists.isEmpty(dashboardData.accounts)}">
                 <p>Nenhuma conta cadastrada.</p>
             </div>
             <div th:unless="${#lists.isEmpty(dashboardData.accounts)}">
-                <a th:each="account : ${dashboardData.accounts}" th:href="@{/accounts/{id}(id=${account.id})}"
-                   class="account-item-link">
+                <a th:each="account : ${dashboardData.accounts}" th:href="@{/accounts/{id}(id=${account.id})}" class="account-item-link">
                     <div class="account-item">
                         <div class="media">
                             <div class="media-left">
@@ -73,16 +81,13 @@
     </div>
 
     <div class="card" style="margin-top: 2rem;">
-        <header class="card-header">
-            <p class="card-header-title">Meus Cartões</p>
-        </header>
+        <header class="card-header"><p class="card-header-title">Meus Cartões</p></header>
         <div class="card-content">
             <div th:if="${#lists.isEmpty(dashboardData.creditCards)}">
                 <p>Nenhum cartão cadastrado.</p>
             </div>
             <div th:unless="${#lists.isEmpty(dashboardData.creditCards)}">
-                <a th:each="card : ${dashboardData.creditCards}" th:href="@{/cards/{id}(id=${card.id})}"
-                   class="account-item-link">
+                <a th:each="card : ${dashboardData.creditCards}" th:href="@{/cards/{id}(id=${card.id})}" class="account-item-link">
                     <div class="account-item">
                         <div class="media">
                             <div class="media-left">
@@ -119,8 +124,29 @@
         </footer>
     </div>
 
-    <div class="modal" id="add-account-modal"></div>
-    <div class="modal" id="add-card-modal"></div>
+    <div class="modal" id="add-account-modal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Adicionar Nova Conta</p>
+                <button class="delete" aria-label="close"></button>
+            </header>
+            <section class="modal-card-body" id="modal-account-form-content">
+            </section>
+        </div>
+    </div>
+
+    <div class="modal" id="add-card-modal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Adicionar Novo Cartão</p>
+                <button class="delete" aria-label="close"></button>
+            </header>
+            <section class="modal-card-body" id="modal-card-form-content">
+            </section>
+        </div>
+    </div>
 
 </div>
 </body>
