@@ -42,33 +42,34 @@
         </div>
     </div>
 
-    <div class="card" style="margin-top: 2rem;">
-        <header class="card-header"><p class="card-header-title">Minhas Contas</p></header>
+    <div class="card" style="margin-top: 2rem;" th:if="${!#lists.isEmpty(dashboardData.upcomingBills)}">
+        <header class="card-header">
+            <p class="card-header-title">Minhas Contas</p>
+        </header>
         <div class="card-content">
             <div th:if="${#lists.isEmpty(dashboardData.accounts)}">
                 <p>Nenhuma conta cadastrada.</p>
             </div>
             <div th:unless="${#lists.isEmpty(dashboardData.accounts)}">
-                <a th:each="account : ${dashboardData.accounts}" th:href="@{/accounts/{id}(id=${account.id})}" class="account-item-link">
-                    <div class="account-item">
-                        <div class="media">
-                            <div class="media-left">
-                               <span class="icon is-medium">
-                                   <i th:if="${account.accountType.name() == 'SAVINGS_ACCOUNT'}"
-                                      class="fa-solid fa-piggy-bank"></i>
-                                   <i th:unless="${account.accountType.name() == 'SAVINGS_ACCOUNT'}"
-                                      class="fa-solid fa-landmark"></i>
-                               </span>
-                            </div>
-                            <div class="media-content">
-                                <strong th:text="${account.name}">Nome da Conta</strong><br/>
-                                <small th:text="${account.institution}">Instituição</small>
-                            </div>
-                            <div class="media-right">
-                                <strong th:classappend="${account.balance.doubleValue() < 0 ? 'has-text-danger' : ''}"
-                                        th:text="'R$ ' + ${#numbers.formatDecimal(account.balance, 1, 'POINT', 2, 'COMMA')}">
-                                </strong>
-                            </div>
+                <a th:each="account : ${dashboardData.accounts}" th:href="@{/accounts/{id}(id=${account.id})}"
+                   class="account-item-link account-item">
+                    <div class="media">
+                        <div class="media-left">
+                           <span class="icon is-medium">
+                               <i th:if="${account.accountType.name() == 'SAVINGS_ACCOUNT'}"
+                                  class="fa-solid fa-piggy-bank"></i>
+                               <i th:unless="${account.accountType.name() == 'SAVINGS_ACCOUNT'}"
+                                  class="fa-solid fa-landmark"></i>
+                           </span>
+                        </div>
+                        <div class="media-content">
+                            <strong th:text="${account.name}">Nome da Conta</strong><br/>
+                            <small th:text="${account.institution}">Instituição</small>
+                        </div>
+                        <div class="media-right">
+                            <strong th:classappend="${account.balance.doubleValue() < 0 ? 'has-text-danger' : ''}"
+                                    th:text="'R$ ' + ${#numbers.formatDecimal(account.balance, 1, 'POINT', 2, 'COMMA')}">
+                            </strong>
                         </div>
                     </div>
                 </a>
@@ -81,37 +82,38 @@
     </div>
 
     <div class="card" style="margin-top: 2rem;">
-        <header class="card-header"><p class="card-header-title">Meus Cartões</p></header>
+        <header class="card-header">
+            <p class="card-header-title">Meus Cartões</p>
+        </header>
         <div class="card-content">
             <div th:if="${#lists.isEmpty(dashboardData.creditCards)}">
                 <p>Nenhum cartão cadastrado.</p>
             </div>
             <div th:unless="${#lists.isEmpty(dashboardData.creditCards)}">
-                <a th:each="card : ${dashboardData.creditCards}" th:href="@{/cards/{id}(id=${card.id})}" class="account-item-link">
-                    <div class="account-item">
-                        <div class="media">
-                            <div class="media-left">
-                                <span class="icon is-medium"><i class="fa-regular fa-credit-card"></i></span>
-                            </div>
-                            <div class="media-content">
-                                <p class="title is-5" th:text="${card.name}">Nome do Cartão</p>
+                <a th:each="card : ${dashboardData.creditCards}" th:href="@{/cards/{id}(id=${card.id})}"
+                   class="account-item-link account-item">
+                    <div class="media">
+                        <div class="media-left">
+                            <span class="icon is-medium"><i class="fa-regular fa-credit-card"></i></span>
+                        </div>
+                        <div class="media-content">
+                            <p class="title is-5" th:text="${card.name}">Nome do Cartão</p>
+                        </div>
+                    </div>
+                    <div class="level is-mobile" style="margin-top: 0.75rem;">
+                        <div class="level-item has-text-centered">
+                            <div>
+                                <p class="heading is-size-7">Disponível</p>
+                                <p class="has-text-weight-semibold"
+                                   th:classappend="${card.availableLimit.doubleValue() < 0 ? 'has-text-danger' : ''}"
+                                   th:text="'R$ ' + ${#numbers.formatDecimal(card.availableLimit, 1, 'POINT', 2, 'COMMA')}"></p>
                             </div>
                         </div>
-                        <div class="level is-mobile" style="margin-top: 0.75rem;">
-                            <div class="level-item has-text-centered">
-                                <div>
-                                    <p class="heading">Disponível</p>
-                                    <p class="title is-6"
-                                       th:classappend="${card.availableLimit.doubleValue() < 0 ? 'has-text-danger' : ''}"
-                                       th:text="'R$ ' + ${#numbers.formatDecimal(card.availableLimit, 1, 'POINT', 2, 'COMMA')}"></p>
-                                </div>
-                            </div>
-                            <div class="level-item has-text-centered">
-                                <div>
-                                    <p class="heading">Fatura atual</p>
-                                    <p class="title is-6 has-text-danger"
-                                       th:text="'-R$ ' + ${#numbers.formatDecimal(card.currentInvoice, 1, 'POINT', 2, 'COMMA')}"></p>
-                                </div>
+                        <div class="level-item has-text-centered">
+                            <div>
+                                <p class="heading is-size-7">Fatura atual</p>
+                                <p class="has-text-weight-semibold has-text-danger"
+                                   th:text="'-R$ ' + ${#numbers.formatDecimal(card.currentInvoice, 1, 'POINT', 2, 'COMMA')}"></p>
                             </div>
                         </div>
                     </div>
